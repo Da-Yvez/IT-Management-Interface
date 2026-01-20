@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -505,23 +506,6 @@
         }
         .form-row { display: flex; gap: 25px; margin-bottom: 22px; }
         .form-row .form-group { flex: 1; }
-        
-        /* === DEVICE TYPE SPECIFIC FIELDS === */
-        .device-type-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: var(--secondary-light);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .device-type-section h3 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
         
         /* === MONITORS SECTION === */
         .monitors-container {
@@ -1201,21 +1185,6 @@
             gap: 10px;
             margin-top: 10px;
         }
-        
-        /* === DEVICE TYPE BADGE === */
-        .device-type-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        
-        .device-type-pc { background: rgba(0, 49, 53, 0.1); color: var(--primary-color); }
-        .device-type-laptop { background: rgba(40, 167, 69, 0.1); color: var(--success-color); }
-        .device-type-printer { background: rgba(23, 162, 184, 0.1); color: var(--info-color); }
-        .device-type-switch { background: rgba(111, 66, 193, 0.1); color: #6f42c1; }
-        .device-type-server { background: rgba(255, 193, 7, 0.1); color: var(--warning-color); }
     </style>
 </head>
 <body>
@@ -1370,7 +1339,6 @@
                             <thead>
                                 <tr>
                                     <th>PC Number</th>
-                                    <th>Device Type</th>
                                     <th>PC Model</th>
                                     <th>IP Address</th>
                                     <th>Department</th>
@@ -1399,97 +1367,24 @@
                         <form id="deviceForm">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="deviceType"><i class="fas fa-desktop"></i> Device Type *</label>
-                                    <select id="deviceType" required class="form-field" tabindex="1" onchange="toggleDeviceTypeFields()">
-                                        <option value="pc" selected>PC</option>
-                                        <option value="laptop">Laptop</option>
-                                        <option value="printer">Printer</option>
-                                        <option value="network-switch">Network Switch</option>
-                                        <option value="server">Server</option>
-                                    </select>
+                                    <label for="pcNumber"><i class="fas fa-hashtag"></i> Device Number *</label>
+                                    <input type="text" id="pcNumber" placeholder="PC-001" required class="form-field" tabindex="1">
                                 </div>
                                 <div class="form-group">
-                                    <label for="pcNumber"><i class="fas fa-hashtag"></i> Device Number *</label>
-                                    <input type="text" id="pcNumber" placeholder="PC-001" required class="form-field" tabindex="2">
+                                    <label for="pcModel"><i class="fas fa-laptop"></i> PC Model *</label>
+                                    <input type="text" id="pcModel" placeholder="Dell OptiPlex 7080" required class="form-field" tabindex="2">
                                 </div>
                             </div>
 
-                            <!-- PC SPECIFIC FIELDS -->
-                            <div id="pcFields" class="device-type-section">
-                                <h3><i class="fas fa-desktop"></i> PC Information</h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="pcModel"><i class="fas fa-laptop"></i> PC Model *</label>
-                                        <input type="text" id="pcModel" placeholder="Dell OptiPlex 7080" required class="form-field" tabindex="3">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="pcSerial"><i class="fas fa-barcode"></i> PC Serial Number *</label>
-                                        <input type="text" id="pcSerial" placeholder="Serial number" required class="form-field" tabindex="4">
-                                    </div>
+                            <!-- PC INFORMATION -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pcSerial"><i class="fas fa-barcode"></i> PC Serial Number *</label>
+                                    <input type="text" id="pcSerial" placeholder="Serial number" required class="form-field" tabindex="3">
                                 </div>
                             </div>
 
-                            <!-- LAPTOP SPECIFIC FIELDS -->
-                            <div id="laptopFields" class="device-type-section" style="display: none;">
-                                <h3><i class="fas fa-laptop"></i> Laptop Information</h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="laptopModel"><i class="fas fa-laptop"></i> Laptop Model *</label>
-                                        <input type="text" id="laptopModel" placeholder="Dell Latitude 5420" class="form-field">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="laptopSerial"><i class="fas fa-barcode"></i> Laptop Serial Number *</label>
-                                        <input type="text" id="laptopSerial" placeholder="Serial number" class="form-field">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PRINTER SPECIFIC FIELDS -->
-                            <div id="printerFields" class="device-type-section" style="display: none;">
-                                <h3><i class="fas fa-print"></i> Printer Information</h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="printerModel"><i class="fas fa-print"></i> Printer Model *</label>
-                                        <input type="text" id="printerModel" placeholder="HP LaserJet Pro MFP" class="form-field">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="printerSerial"><i class="fas fa-barcode"></i> Printer Serial Number *</label>
-                                        <input type="text" id="printerSerial" placeholder="Serial number" class="form-field">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- NETWORK SWITCH SPECIFIC FIELDS -->
-                            <div id="switchFields" class="device-type-section" style="display: none;">
-                                <h3><i class="fas fa-network-wired"></i> Network Switch Information</h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="switchModel"><i class="fas fa-network-wired"></i> Switch Model *</label>
-                                        <input type="text" id="switchModel" placeholder="Cisco Catalyst 2960" class="form-field">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="switchSerial"><i class="fas fa-barcode"></i> Switch Serial Number *</label>
-                                        <input type="text" id="switchSerial" placeholder="Serial number" class="form-field">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- SERVER SPECIFIC FIELDS -->
-                            <div id="serverFields" class="device-type-section" style="display: none;">
-                                <h3><i class="fas fa-server"></i> Server Information</h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="serverModel"><i class="fas fa-server"></i> Server Model *</label>
-                                        <input type="text" id="serverModel" placeholder="Dell PowerEdge R740" class="form-field">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="serverSerial"><i class="fas fa-barcode"></i> Server Serial Number *</label>
-                                        <input type="text" id="serverSerial" placeholder="Serial number" class="form-field">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- NETWORK INTERFACES SECTION (PC, Laptop, Server) -->
+                            <!-- NETWORK INTERFACES SECTION -->
                             <div class="network-interfaces-container" id="networkInterfacesContainer">
                                 <h3 style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fas fa-network-wired"></i> Network Interfaces
@@ -1502,7 +1397,7 @@
                                 </button>
                             </div>
 
-                            <!-- MONITORS SECTION (PC only) -->
+                            <!-- MONITORS SECTION -->
                             <div class="monitors-container" id="monitorsContainer">
                                 <h3 style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fas fa-tv"></i> Monitors
@@ -1531,40 +1426,40 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="department"><i class="fas fa-building"></i> Department *</label>
-                                    <select id="department" required class="form-field" tabindex="5">
+                                    <select id="department" required class="form-field" tabindex="4">
                                         <option value="">Select Department</option>
                                         <!-- Departments will be populated based on site -->
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="userName"><i class="fas fa-user"></i> User Name</label>
-                                    <input type="text" id="userName" placeholder="User's name" class="form-field" tabindex="6">
+                                    <input type="text" id="userName" placeholder="User's name" class="form-field" tabindex="5">
                                 </div>
                             </div>
 
-                            <!-- SPECIFICATIONS GRID (PC and Server) -->
+                            <!-- SPECIFICATIONS GRID -->
                             <div class="specs-grid" id="specsGrid">
                                 <div class="spec-card">
                                     <label><i class="fas fa-microchip"></i> CPU</label>
-                                    <input type="text" id="cpu" placeholder="e.g., Intel i7-10700" class="form-field" tabindex="7">
+                                    <input type="text" id="cpu" placeholder="e.g., Intel i7-10700" class="form-field" tabindex="6">
                                 </div>
                                 <div class="spec-card">
                                     <label><i class="fas fa-gamepad"></i> GPU</label>
-                                    <input type="text" id="gpu" placeholder="e.g., NVIDIA GTX 1660" class="form-field" tabindex="8">
+                                    <input type="text" id="gpu" placeholder="e.g., NVIDIA GTX 1660" class="form-field" tabindex="7">
                                 </div>
                                 <div class="spec-card">
                                     <label><i class="fas fa-memory"></i> RAM</label>
-                                    <input type="text" id="ram" placeholder="e.g., 16GB DDR4" class="form-field" tabindex="9">
+                                    <input type="text" id="ram" placeholder="e.g., 16GB DDR4" class="form-field" tabindex="8">
                                 </div>
                                 <div class="spec-card">
                                     <label><i class="fas fa-hdd"></i> Storage</label>
-                                    <input type="text" id="storage" placeholder="e.g., 512GB SSD" class="form-field" tabindex="10">
+                                    <input type="text" id="storage" placeholder="e.g., 512GB SSD" class="form-field" tabindex="9">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="status"><i class="fas fa-info-circle"></i> Device Status</label>
-                                <select id="status" class="form-field" tabindex="11">
+                                <select id="status" class="form-field" tabindex="10">
                                     <option value="active">Active</option>
                                     <option value="failed">Failed</option>
                                     <option value="replaced">Replaced</option>
@@ -1664,7 +1559,6 @@
                             <thead>
                                 <tr>
                                     <th>Device Number</th>
-                                    <th>Device Type</th>
                                     <th>Model</th>
                                     <th>Department</th>
                                     <th>Failure Reason</th>
@@ -1756,7 +1650,7 @@
                         
                         <div class="excel-actions">
                             <button class="btn btn-excel" id="exportAllBtn">
-                                <i class="fas fa-file-export"></i> Export All Devices
+                                <i class="fas fa-file-export"></i> Export All Devices (Grouped by Department)
                             </button>
                             <button class="btn btn-success" id="exportActiveBtn">
                                 <i class="fas fa-file-export"></i> Export Active Devices
@@ -1978,7 +1872,7 @@
                 fullName: "Wijeya Television Corporation",
                 icon: "fas fa-building",
                 technicians: ["Adithya", "Minosh", "Niluksha", "Gayan"],
-                departments: ["Engineering", "NEWS", "Scheduling", "MCR", "PCR 1", "PCR 2", "Marketing A/B", "Marketing C", "Research", "Political", "GFX", "Transmission"],
+                departments: ["Engineering", "NEWS", "Scheduling", "MCR", "PCR 1", "PCR 2", "Marketing A/B", "Marketing C", "Research", "Political", "GFX", "Transmission", "Library", "Maintenance"],
                 networkDiagram: "https://www.canva.com/design/DAG-MlkG1Bs/fTfu6FEhnj8pTLDKAXJZcQ/view?utm_content=DAG-MlkG1Bs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h150b286d2a",
                 firebaseCollection: "devices_wtc",
                 logsCollection: "activityLogs_wtc",
@@ -1989,7 +1883,7 @@
                 fullName: "Hiru Live Streaming",
                 icon: "fas fa-city",
                 technicians: ["Navendra"],
-                departments: ["Production", "PCR", "Engineering", "Camera"],
+                departments: ["Production", "PCR", "Engineering", "Camera", "Library", "Maintenance"],
                 networkDiagram: "https://www.canva.com/design/DAG-e1F-ViA/nsJaRxmGmBmsY19qmF0SCg/view?utm_content=DAG-e1F-ViA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h89c18793db",
                 firebaseCollection: "devices_hls",
                 logsCollection: "activityLogs_hls",
@@ -2243,8 +2137,119 @@
         }
 
         // ============================================
-        // EXCEL IMPORT/EXPORT FUNCTIONS
+        // EXCEL IMPORT/EXPORT FUNCTIONS - UPDATED (Device Type Removed)
         // ============================================
+        function exportToExcelGroupedByDepartment(data, filename = 'devices') {
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // Group devices by department
+                const devicesByDepartment = {};
+                data.forEach(device => {
+                    const department = device.department || 'Unknown';
+                    if (!devicesByDepartment[department]) {
+                        devicesByDepartment[department] = [];
+                    }
+                    devicesByDepartment[department].push(device);
+                });
+                
+                // Sort departments alphabetically
+                const sortedDepartments = Object.keys(devicesByDepartment).sort();
+                
+                // Create a sheet for each department
+                sortedDepartments.forEach((department, index) => {
+                    const departmentDevices = devicesByDepartment[department];
+                    
+                    const excelData = departmentDevices.map(device => {
+                        let networkInfo = 'N/A';
+                        if (device.networkInterfaces && device.networkInterfaces.length > 0) {
+                            networkInfo = device.networkInterfaces.map(iface => 
+                                `${iface.interfaceName || 'Interface'}: ${iface.ipAddress || 'N/A'}`
+                            ).join('; ');
+                        }
+                        
+                        let softwareInfo = 'N/A';
+                        if (device.softwareLicenses && device.softwareLicenses.length > 0) {
+                            softwareInfo = device.softwareLicenses.map(software => 
+                                `${software.name || 'Software'} ${software.version || ''}`
+                            ).join('; ');
+                        }
+                        
+                        let monitorInfo = 'N/A';
+                        if (device.monitors && device.monitors.length > 0) {
+                            monitorInfo = device.monitors.map(monitor => 
+                                `${monitor.model || 'Monitor'}: ${monitor.serial || 'N/A'}`
+                            ).join('; ');
+                        }
+                        
+                        return {
+                            'Device Number': device.pcNumber || 'N/A',
+                            'Model': device.pcModel || 'N/A',
+                            'Serial': device.pcSerial || 'N/A',
+                            'Department': device.department || 'N/A',
+                            'User Name': device.userName || 'N/A',
+                            'IP Address': networkInfo,
+                            'CPU': device.cpu || 'N/A',
+                            'GPU': device.gpu || 'N/A',
+                            'RAM': device.ram || 'N/A',
+                            'Storage': device.storage || 'N/A',
+                            'Monitors': monitorInfo,
+                            'Status': device.status || 'active',
+                            'Software Licenses': softwareInfo,
+                            'Created By': device.createdBy || 'N/A',
+                            'Created Date': device.createdAt ? (device.createdAt.toDate ? device.createdAt.toDate().toLocaleDateString() : device.createdAt) : 'N/A',
+                            'Updated By': device.updatedBy || 'N/A',
+                            'Updated Date': device.updatedAt ? (device.updatedAt.toDate ? device.updatedAt.toDate().toLocaleDateString() : device.updatedAt) : 'N/A'
+                        };
+                    });
+
+                    const ws = XLSX.utils.json_to_sheet(excelData);
+                    
+                    // Add department title at the top
+                    const titleRow = [['DEPARTMENT: ' + department]];
+                    const emptyRow = [['']];
+                    XLSX.utils.sheet_add_aoa(ws, titleRow, { origin: 'A1' });
+                    XLSX.utils.sheet_add_aoa(ws, emptyRow, { origin: 'A2' });
+                    
+                    // Add column headers starting from row 3
+                    const headerRow = [Object.keys(excelData[0] || {})];
+                    XLSX.utils.sheet_add_aoa(ws, headerRow, { origin: 'A3' });
+                    
+                    // Add data starting from row 4
+                    const dataRows = excelData.map(device => Object.values(device));
+                    if (dataRows.length > 0) {
+                        XLSX.utils.sheet_add_aoa(ws, dataRows, { origin: 'A4' });
+                    }
+                    
+                    const wscols = [
+                        { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 20 }, 
+                        { wch: 20 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, 
+                        { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, 
+                        { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, 
+                        { wch: 15 }
+                    ];
+                    ws['!cols'] = wscols;
+                    
+                    // Limit sheet name to 31 characters and make it safe for Excel
+                    let sheetName = department.substring(0, 31).replace(/[\\/*\[\]:?]/g, '');
+                    if (sheetName.length === 0) sheetName = 'Sheet' + (index + 1);
+                    
+                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                });
+                
+                const dateStr = new Date().toISOString().split('T')[0];
+                const exportFilename = `${filename}_${currentSite.name}_${dateStr}.xlsx`;
+                
+                XLSX.writeFile(wb, exportFilename);
+                
+                return true;
+            } catch (error) {
+                console.error("Error exporting to Excel:", error);
+                alert("Error exporting to Excel: " + error.message);
+                return false;
+            }
+        }
+
         function exportToExcel(data, filename = 'devices') {
             try {
                 const excelData = data.map(device => {
@@ -2271,9 +2276,8 @@
                     
                     return {
                         'Device Number': device.pcNumber || 'N/A',
-                        'Device Type': device.deviceType || 'pc',
-                        'Model': device.pcModel || device.laptopModel || device.printerModel || device.switchModel || device.serverModel || 'N/A',
-                        'Serial': device.pcSerial || device.laptopSerial || device.printerSerial || device.switchSerial || device.serverSerial || 'N/A',
+                        'Model': device.pcModel || 'N/A',
+                        'Serial': device.pcSerial || 'N/A',
                         'Department': device.department || 'N/A',
                         'User Name': device.userName || 'N/A',
                         'IP Address': networkInfo,
@@ -2294,10 +2298,11 @@
                 const ws = XLSX.utils.json_to_sheet(excelData);
                 
                 const wscols = [
-                    { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 20 }, 
-                    { wch: 20 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 15 }, 
-                    { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 30 }, { wch: 15 }, 
-                    { wch: 15 }, { wch: 15 }, { wch: 15 }
+                    { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 20 }, 
+                    { wch: 20 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, 
+                    { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, 
+                    { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, 
+                    { wch: 15 }
                 ];
                 ws['!cols'] = wscols;
 
@@ -2322,7 +2327,6 @@
                 const templateData = [
                     {
                         'Device Number': 'PC-001',
-                        'Device Type': 'pc',
                         'Model': 'Dell OptiPlex 7080',
                         'Serial': 'ABC123456',
                         'Department': 'Engineering',
@@ -2345,17 +2349,15 @@
                 const instructions = [
                     ['IMPORT INSTRUCTIONS'],
                     [''],
-                    ['1. Required columns: Device Number, Device Type, Model, Serial, Department'],
-                    ['2. Device Type can be: pc, laptop, printer, network-switch, or server'],
-                    ['3. Status can be: active, failed, or replaced'],
-                    ['4. All other columns are optional'],
-                    ['5. Do not change the column headers'],
-                    ['6. Maximum 100 devices per import'],
-                    ['7. Remove this instructions sheet before importing'],
+                    ['1. Required columns: Device Number, Model, Serial, Department'],
+                    ['2. Status can be: active, failed, or replaced'],
+                    ['3. All other columns are optional'],
+                    ['4. Do not change the column headers'],
+                    ['5. Maximum 100 devices per import'],
+                    ['6. Remove this instructions sheet before importing'],
                     [''],
                     ['COLUMN DESCRIPTIONS'],
-                    ['Device Number: Unique identifier (e.g., PC-001, LAP-001)'],
-                    ['Device Type: Type of device (pc/laptop/printer/network-switch/server)'],
+                    ['Device Number: Unique identifier (e.g., PC-001)'],
                     ['Model: Model name/number'],
                     ['Serial: Serial number of the device'],
                     ['Department: Department where device is located'],
@@ -2364,7 +2366,7 @@
                     ['GPU: Graphics card specifications'],
                     ['RAM: Memory specifications'],
                     ['Storage: Storage specifications'],
-                    ['Monitors: For PCs only - Format: Model:Serial; Model:Serial'],
+                    ['Monitors: Format: Model:Serial; Model:Serial'],
                     ['Status: Device status (active/failed/replaced)'],
                     ['Software Licenses: Format: Software:Key; Software:Key'],
                     ['Notes: Any additional notes']
@@ -2417,7 +2419,7 @@
                             const rowNum = i + 2;
                             
                             try {
-                                if (!row['Device Number'] || !row['Device Type'] || !row['Model'] || !row['Serial'] || !row['Department']) {
+                                if (!row['Device Number'] || !row['Model'] || !row['Serial'] || !row['Department']) {
                                     throw new Error("Missing required fields");
                                 }
                                 
@@ -2430,14 +2432,10 @@
                                     throw new Error("Status must be 'active', 'failed', or 'replaced'");
                                 }
                                 
-                                const deviceType = row['Device Type'] || 'pc';
-                                if (!['pc', 'laptop', 'printer', 'network-switch', 'server'].includes(deviceType.toLowerCase())) {
-                                    throw new Error("Device Type must be 'pc', 'laptop', 'printer', 'network-switch', or 'server'");
-                                }
-                                
                                 const deviceData = {
                                     pcNumber: String(row['Device Number']).trim(),
-                                    deviceType: deviceType.toLowerCase(),
+                                    pcModel: String(row['Model']).trim(),
+                                    pcSerial: String(row['Serial']).trim(),
                                     department: String(row['Department']).trim(),
                                     userName: row['User Name'] ? String(row['User Name']).trim() : '',
                                     status: status.toLowerCase(),
@@ -2448,44 +2446,22 @@
                                     site: currentSite.name
                                 };
                                 
-                                if (deviceType === 'pc') {
-                                    deviceData.pcModel = String(row['Model']).trim();
-                                    deviceData.pcSerial = String(row['Serial']).trim();
-                                    deviceData.cpu = row['CPU'] ? String(row['CPU']).trim() : '';
-                                    deviceData.gpu = row['GPU'] ? String(row['GPU']).trim() : '';
-                                    deviceData.ram = row['RAM'] ? String(row['RAM']).trim() : '';
-                                    deviceData.storage = row['Storage'] ? String(row['Storage']).trim() : '';
-                                    
-                                    if (row['Monitors']) {
-                                        const monitorPairs = String(row['Monitors']).split(';').map(pair => pair.trim());
-                                        monitorPairs.forEach(pair => {
-                                            const parts = pair.split(':').map(p => p.trim());
-                                            if (parts.length >= 2) {
-                                                deviceData.monitors.push({
-                                                    model: parts[0],
-                                                    serial: parts[1]
-                                                });
-                                            }
-                                        });
-                                    }
-                                } else if (deviceType === 'laptop') {
-                                    deviceData.laptopModel = String(row['Model']).trim();
-                                    deviceData.laptopSerial = String(row['Serial']).trim();
-                                    deviceData.cpu = row['CPU'] ? String(row['CPU']).trim() : '';
-                                    deviceData.ram = row['RAM'] ? String(row['RAM']).trim() : '';
-                                    deviceData.storage = row['Storage'] ? String(row['Storage']).trim() : '';
-                                } else if (deviceType === 'printer') {
-                                    deviceData.printerModel = String(row['Model']).trim();
-                                    deviceData.printerSerial = String(row['Serial']).trim();
-                                } else if (deviceType === 'network-switch') {
-                                    deviceData.switchModel = String(row['Model']).trim();
-                                    deviceData.switchSerial = String(row['Serial']).trim();
-                                } else if (deviceType === 'server') {
-                                    deviceData.serverModel = String(row['Model']).trim();
-                                    deviceData.serverSerial = String(row['Serial']).trim();
-                                    deviceData.cpu = row['CPU'] ? String(row['CPU']).trim() : '';
-                                    deviceData.ram = row['RAM'] ? String(row['RAM']).trim() : '';
-                                    deviceData.storage = row['Storage'] ? String(row['Storage']).trim() : '';
+                                deviceData.cpu = row['CPU'] ? String(row['CPU']).trim() : '';
+                                deviceData.gpu = row['GPU'] ? String(row['GPU']).trim() : '';
+                                deviceData.ram = row['RAM'] ? String(row['RAM']).trim() : '';
+                                deviceData.storage = row['Storage'] ? String(row['Storage']).trim() : '';
+                                
+                                if (row['Monitors']) {
+                                    const monitorPairs = String(row['Monitors']).split(';').map(pair => pair.trim());
+                                    monitorPairs.forEach(pair => {
+                                        const parts = pair.split(':').map(p => p.trim());
+                                        if (parts.length >= 2) {
+                                            deviceData.monitors.push({
+                                                model: parts[0],
+                                                serial: parts[1]
+                                            });
+                                        }
+                                    });
                                 }
                                 
                                 await saveDeviceToFirebase(deviceData);
@@ -2799,72 +2775,16 @@
         }
 
         // ============================================
-        // DEVICE TYPE FIELD TOGGLE
+        // GET DEVICE MODEL AND SERIAL FUNCTIONS
         // ============================================
-        function toggleDeviceTypeFields() {
-            const deviceType = document.getElementById('deviceType').value;
-            
-            // Hide all sections first
-            document.getElementById('pcFields').style.display = 'none';
-            document.getElementById('laptopFields').style.display = 'none';
-            document.getElementById('printerFields').style.display = 'none';
-            document.getElementById('switchFields').style.display = 'none';
-            document.getElementById('serverFields').style.display = 'none';
-            document.getElementById('specsGrid').style.display = 'none';
-            document.getElementById('networkInterfacesContainer').style.display = 'none';
-            document.getElementById('monitorsContainer').style.display = 'none';
-            document.getElementById('softwareLicensesContainer').style.display = 'none';
-            
-            // Show relevant sections based on device type
-            switch (deviceType) {
-                case 'pc':
-                    document.getElementById('pcFields').style.display = 'block';
-                    document.getElementById('specsGrid').style.display = 'grid';
-                    document.getElementById('networkInterfacesContainer').style.display = 'block';
-                    document.getElementById('monitorsContainer').style.display = 'block';
-                    document.getElementById('softwareLicensesContainer').style.display = 'block';
-                    break;
-                case 'laptop':
-                    document.getElementById('laptopFields').style.display = 'block';
-                    document.getElementById('specsGrid').style.display = 'grid';
-                    document.getElementById('networkInterfacesContainer').style.display = 'block';
-                    document.getElementById('softwareLicensesContainer').style.display = 'block';
-                    break;
-                case 'printer':
-                    document.getElementById('printerFields').style.display = 'block';
-                    document.getElementById('networkInterfacesContainer').style.display = 'block';
-                    break;
-                case 'network-switch':
-                    document.getElementById('switchFields').style.display = 'block';
-                    document.getElementById('networkInterfacesContainer').style.display = 'block';
-                    break;
-                case 'server':
-                    document.getElementById('serverFields').style.display = 'block';
-                    document.getElementById('specsGrid').style.display = 'grid';
-                    document.getElementById('networkInterfacesContainer').style.display = 'block';
-                    document.getElementById('softwareLicensesContainer').style.display = 'block';
-                    break;
-            }
-            
-            // Update placeholder text for device number
-            const pcNumberInput = document.getElementById('pcNumber');
-            switch (deviceType) {
-                case 'pc':
-                    pcNumberInput.placeholder = 'PC-001';
-                    break;
-                case 'laptop':
-                    pcNumberInput.placeholder = 'LAP-001';
-                    break;
-                case 'printer':
-                    pcNumberInput.placeholder = 'PRN-001';
-                    break;
-                case 'network-switch':
-                    pcNumberInput.placeholder = 'SW-001';
-                    break;
-                case 'server':
-                    pcNumberInput.placeholder = 'SRV-001';
-                    break;
-            }
+        function getDeviceModel(device) {
+            if (!device) return 'N/A';
+            return device.pcModel || 'N/A';
+        }
+
+        function getDeviceSerial(device) {
+            if (!device) return 'N/A';
+            return device.pcSerial || 'N/A';
         }
 
         // ============================================
@@ -2893,35 +2813,6 @@
             
             console.log("📝 Using sample logs for display");
             return sampleLogs;
-        }
-
-        // ============================================
-        // DEVICE TYPE BADGE FUNCTIONS
-        // ============================================
-        function getDeviceTypeBadge(deviceType) {
-            switch (deviceType) {
-                case 'pc':
-                    return '<span class="device-type-badge device-type-pc"><i class="fas fa-desktop"></i> PC</span>';
-                case 'laptop':
-                    return '<span class="device-type-badge device-type-laptop"><i class="fas fa-laptop"></i> Laptop</span>';
-                case 'printer':
-                    return '<span class="device-type-badge device-type-printer"><i class="fas fa-print"></i> Printer</span>';
-                case 'network-switch':
-                    return '<span class="device-type-badge device-type-switch"><i class="fas fa-network-wired"></i> Switch</span>';
-                case 'server':
-                    return '<span class="device-type-badge device-type-server"><i class="fas fa-server"></i> Server</span>';
-                default:
-                    return '<span class="device-type-badge device-type-pc"><i class="fas fa-desktop"></i> PC</span>';
-            }
-        }
-
-        function getDeviceModel(device) {
-            if (device.deviceType === 'pc') return device.pcModel || 'N/A';
-            if (device.deviceType === 'laptop') return device.laptopModel || 'N/A';
-            if (device.deviceType === 'printer') return device.printerModel || 'N/A';
-            if (device.deviceType === 'network-switch') return device.switchModel || 'N/A';
-            if (device.deviceType === 'server') return device.serverModel || 'N/A';
-            return device.pcModel || 'N/A';
         }
 
         // ============================================
@@ -2984,7 +2875,6 @@
         const deviceForm = document.getElementById('deviceForm');
         const cancelBtn = document.getElementById('cancelBtn');
         const saveDeviceBtn = document.getElementById('saveDeviceBtn');
-        const deviceTypeSelect = document.getElementById('deviceType');
         
         // Report Failure
         const failureReportForm = document.getElementById('failureReportForm');
@@ -3168,7 +3058,6 @@
                 addDefaultSoftwareLicense();
                 
                 setupEnterKeyNavigation();
-                toggleDeviceTypeFields();
                 
             }, 800);
         }
@@ -3215,7 +3104,7 @@
         }
 
         // ============================================
-        // EXCEL IMPORT/EXPORT EVENT HANDLERS
+        // EXCEL IMPORT/EXPORT EVENT HANDLERS - UPDATED
         // ============================================
         exportBtn.addEventListener('click', function() {
             if (!inventoryData || inventoryData.length === 0) {
@@ -3223,8 +3112,8 @@
                 return;
             }
             
-            exportToExcel(inventoryData, 'All_Devices');
-            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel`);
+            exportToExcelGroupedByDepartment(inventoryData, 'All_Devices');
+            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel grouped by department`);
         });
 
         exportAllBtn.addEventListener('click', function() {
@@ -3233,8 +3122,8 @@
                 return;
             }
             
-            exportToExcel(inventoryData, 'All_Devices');
-            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel`);
+            exportToExcelGroupedByDepartment(inventoryData, 'All_Devices');
+            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel grouped by department`);
         });
 
         exportActiveBtn.addEventListener('click', function() {
@@ -3641,14 +3530,9 @@
                     </div>
                 `;
                 
-                const deviceType = device.deviceType || 'pc';
-                const deviceModel = getDeviceModel(device);
-                const deviceTypeBadge = getDeviceTypeBadge(deviceType);
-                
                 row.innerHTML = `
                     <td><strong>${device.pcNumber || 'N/A'}</strong></td>
-                    <td>${deviceTypeBadge}</td>
-                    <td>${deviceModel}</td>
+                    <td>${getDeviceModel(device)}</td>
                     <td>${ipInfo}</td>
                     <td><span class="status-badge" style="background: rgba(0, 49, 53, 0.1); color: var(--primary-color);">${device.department || 'N/A'}</span></td>
                     <td>${device.userName || 'N/A'}</td>
@@ -3778,7 +3662,7 @@
         });
 
         // ============================================
-        // INVENTORY TABLE
+        // INVENTORY TABLE - UPDATED SEARCH FUNCTIONALITY
         // ============================================
         function loadInventoryTable() {
             const searchTerm = searchBox.value.toLowerCase();
@@ -3787,14 +3671,13 @@
             let filteredData = inventoryData.filter(device => {
                 const matchesSearch = 
                     (device.pcNumber && device.pcNumber.toLowerCase().includes(searchTerm)) || 
-                    (device.pcSerial && device.pcSerial.toLowerCase().includes(searchTerm)) ||
-                    (device.laptopSerial && device.laptopSerial.toLowerCase().includes(searchTerm)) ||
-                    (device.printerSerial && device.printerSerial.toLowerCase().includes(searchTerm)) ||
-                    (device.switchSerial && device.switchSerial.toLowerCase().includes(searchTerm)) ||
-                    (device.serverSerial && device.serverSerial.toLowerCase().includes(searchTerm)) ||
+                    (getDeviceSerial(device) && getDeviceSerial(device).toLowerCase().includes(searchTerm)) ||
                     (device.userName && device.userName.toLowerCase().includes(searchTerm)) ||
                     (device.monitors && device.monitors.some(monitor => 
                         monitor.serial && monitor.serial.toLowerCase().includes(searchTerm)
+                    )) ||
+                    (device.softwareLicenses && device.softwareLicenses.some(software => 
+                        software.licenseKey && software.licenseKey.toLowerCase().includes(searchTerm)
                     ));
                 
                 const matchesDepartment = !department || device.department === department;
@@ -3844,14 +3727,9 @@
                     </div>
                 `;
                 
-                const deviceType = device.deviceType || 'pc';
-                const deviceModel = getDeviceModel(device);
-                const deviceTypeBadge = getDeviceTypeBadge(deviceType);
-                
                 row.innerHTML = `
                     <td><strong>${device.pcNumber || 'N/A'}</strong></td>
-                    <td>${deviceTypeBadge}</td>
-                    <td>${deviceModel}</td>
+                    <td>${getDeviceModel(device)}</td>
                     <td>${ipInfo}</td>
                     <td><span class="status-badge" style="background: rgba(0, 49, 53, 0.1); color: var(--primary-color);">${device.department || 'N/A'}</span></td>
                     <td>${device.userName || 'N/A'}</td>
@@ -3912,7 +3790,8 @@
                 const matchesSearch = 
                     (device.pcNumber && device.pcNumber.toLowerCase().includes(searchTerm)) || 
                     (getDeviceModel(device) && getDeviceModel(device).toLowerCase().includes(searchTerm)) ||
-                    (device.userName && device.userName.toLowerCase().includes(searchTerm));
+                    (device.userName && device.userName.toLowerCase().includes(searchTerm)) ||
+                    (getDeviceSerial(device) && getDeviceSerial(device).toLowerCase().includes(searchTerm));
                 
                 const matchesPriority = !priority || (device.failureReport && device.failureReport.priority === priority);
                 
@@ -3943,14 +3822,9 @@
                     priorityBadge = '<span class="status-badge" style="background: rgba(111, 66, 193, 0.1); color: #6f42c1;">Critical</span>';
                 }
                 
-                const deviceType = device.deviceType || 'pc';
-                const deviceModel = getDeviceModel(device);
-                const deviceTypeBadge = getDeviceTypeBadge(deviceType);
-                
                 row.innerHTML = `
                     <td><strong>${device.pcNumber || 'N/A'}</strong></td>
-                    <td>${deviceTypeBadge}</td>
-                    <td>${deviceModel}</td>
+                    <td>${getDeviceModel(device)}</td>
                     <td>${device.department || 'N/A'}</td>
                     <td>${device.failureReport?.reason?.substring(0, 50) || 'No reason provided'}...</td>
                     <td>${device.failureReport?.reportedBy || 'Unknown'}</td>
@@ -4004,9 +3878,7 @@
                 if (device.status !== 'failed' && device.status !== 'replaced') {
                     const option = document.createElement('option');
                     option.value = device.id;
-                    const deviceType = device.deviceType || 'pc';
-                    const deviceModel = getDeviceModel(device);
-                    option.textContent = `${device.pcNumber} - ${deviceModel} (${device.userName || 'No User'})`;
+                    option.textContent = `${device.pcNumber} - ${getDeviceModel(device)} (${device.userName || 'No User'})`;
                     failureDevice.appendChild(option);
                 }
             });
@@ -4017,9 +3889,7 @@
             inventoryData.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.id;
-                const deviceType = device.deviceType || 'pc';
-                const deviceModel = getDeviceModel(device);
-                option.textContent = `${device.pcNumber} - ${deviceModel} (${device.userName || 'No User'})`;
+                option.textContent = `${device.pcNumber} - ${getDeviceModel(device)} (${device.userName || 'No User'})`;
                 replaceDeviceSelect.appendChild(option);
             });
         }
@@ -4054,7 +3924,7 @@
         }
 
         // ============================================
-        // DEVICE DETAILS (FULL SCREEN)
+        // DEVICE DETAILS (FULL SCREEN) - REMOVED DEVICE TYPE
         // ============================================
         async function showDeviceDetails(deviceId) {
             const device = inventoryData.find(d => d.id === deviceId);
@@ -4062,229 +3932,22 @@
             
             currentDeviceId = deviceId;
             
-            const deviceType = device.deviceType || 'pc';
-            const deviceTypeName = deviceType.charAt(0).toUpperCase() + deviceType.slice(1);
-            
-            let deviceTypeInfo = '';
-            if (deviceType === 'pc') {
-                deviceTypeInfo = `
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-laptop"></i> PC Model:</div>
-                        <div class="device-value">${device.pcModel || 'N/A'}</div>
-                    </div>
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-barcode"></i> PC Serial:</div>
-                        <div class="device-value">${device.pcSerial || 'N/A'}</div>
-                    </div>
-                `;
-            } else if (deviceType === 'laptop') {
-                deviceTypeInfo = `
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-laptop"></i> Laptop Model:</div>
-                        <div class="device-value">${device.laptopModel || 'N/A'}</div>
-                    </div>
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-barcode"></i> Laptop Serial:</div>
-                        <div class="device-value">${device.laptopSerial || 'N/A'}</div>
-                    </div>
-                `;
-            } else if (deviceType === 'printer') {
-                deviceTypeInfo = `
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-print"></i> Printer Model:</div>
-                        <div class="device-value">${device.printerModel || 'N/A'}</div>
-                    </div>
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-barcode"></i> Printer Serial:</div>
-                        <div class="device-value">${device.printerSerial || 'N/A'}</div>
-                    </div>
-                `;
-            } else if (deviceType === 'network-switch') {
-                deviceTypeInfo = `
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-network-wired"></i> Switch Model:</div>
-                        <div class="device-value">${device.switchModel || 'N/A'}</div>
-                    </div>
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-barcode"></i> Switch Serial:</div>
-                        <div class="device-value">${device.switchSerial || 'N/A'}</div>
-                    </div>
-                `;
-            } else if (deviceType === 'server') {
-                deviceTypeInfo = `
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-server"></i> Server Model:</div>
-                        <div class="device-value">${device.serverModel || 'N/A'}</div>
-                    </div>
-                    <div class="device-item">
-                        <div class="device-label"><i class="fas fa-barcode"></i> Server Serial:</div>
-                        <div class="device-value">${device.serverSerial || 'N/A'}</div>
-                    </div>
-                `;
-            }
-            
-            const specsGrid = (deviceType === 'pc' || deviceType === 'laptop' || deviceType === 'server') && (device.cpu || device.ram || device.storage) ? `
-                <div class="specs-grid-modal">
-                    ${device.cpu ? `
-                    <div class="spec-item">
-                        <div class="spec-icon">
-                            <i class="fas fa-microchip"></i>
-                        </div>
-                        <div class="spec-name">CPU</div>
-                        <div class="spec-value">${device.cpu}</div>
-                    </div>
-                    ` : ''}
-                    
-                    ${device.gpu ? `
-                    <div class="spec-item">
-                        <div class="spec-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="spec-name">GPU</div>
-                        <div class="spec-value">${device.gpu}</div>
-                    </div>
-                    ` : ''}
-                    
-                    ${device.ram ? `
-                    <div class="spec-item">
-                        <div class="spec-icon">
-                            <i class="fas fa-memory"></i>
-                        </div>
-                        <div class="spec-name">RAM</div>
-                        <div class="spec-value">${device.ram}</div>
-                    </div>
-                    ` : ''}
-                    
-                    ${device.storage ? `
-                    <div class="spec-item">
-                        <div class="spec-icon">
-                            <i class="fas fa-hdd"></i>
-                        </div>
-                        <div class="spec-name">Storage</div>
-                        <div class="spec-value">${device.storage}</div>
-                    </div>
-                    ` : ''}
-                </div>
-            ` : '';
-            
-            let networkInterfacesHTML = '';
-            if (device.networkInterfaces && device.networkInterfaces.length > 0) {
-                networkInterfacesHTML = `
-                    <div class="network-interfaces-grid">
-                        ${device.networkInterfaces.map(iface => `
-                            <div class="network-interface-card">
-                                <h4><i class="fas fa-network-wired"></i> ${iface.interfaceName || 'Network Interface'}</h4>
-                                <div class="interface-detail">
-                                    <span class="interface-label">IP Address:</span>
-                                    <span class="interface-value">${iface.ipAddress || 'N/A'}</span>
-                                </div>
-                                ${iface.subnetMask ? `
-                                <div class="interface-detail">
-                                    <span class="interface-label">Subnet Mask:</span>
-                                    <span class="interface-value">${iface.subnetMask}</span>
-                                </div>
-                                ` : ''}
-                                ${iface.gateway ? `
-                                <div class="interface-detail">
-                                    <span class="interface-label">Gateway:</span>
-                                    <span class="interface-value">${iface.gateway}</span>
-                                </div>
-                                ` : ''}
-                                ${iface.macAddress ? `
-                                <div class="interface-detail">
-                                    <span class="interface-label">MAC Address:</span>
-                                    <span class="interface-value">${iface.macAddress}</span>
-                                </div>
-                                ` : ''}
-                                ${iface.type ? `
-                                <div class="interface-detail">
-                                    <span class="interface-label">Type:</span>
-                                    <span class="interface-value">${iface.type.charAt(0).toUpperCase() + iface.type.slice(1)}</span>
-                                </div>
-                                ` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            let monitorsHTML = '';
-            if (device.monitors && device.monitors.length > 0) {
-                monitorsHTML = `
-                    <div class="monitors-grid">
-                        ${device.monitors.map((monitor, index) => `
-                            <div class="monitor-card">
-                                <h4><i class="fas fa-tv"></i> Monitor ${index + 1}</h4>
-                                <div class="monitor-detail">
-                                    <span class="monitor-label">Model:</span>
-                                    <span class="monitor-value">${monitor.model || 'N/A'}</span>
-                                </div>
-                                <div class="monitor-detail">
-                                    <span class="monitor-label">Serial:</span>
-                                    <span class="monitor-value">${monitor.serial || 'N/A'}</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            let softwareLicensesHTML = '';
-            if (device.softwareLicenses && device.softwareLicenses.length > 0) {
-                softwareLicensesHTML = `
-                    <div class="software-grid">
-                        ${device.softwareLicenses.map(software => `
-                            <div class="software-card">
-                                <h4><i class="fas fa-copyright"></i> ${software.name || 'Unnamed Software'}</h4>
-                                ${software.version ? `
-                                <div class="software-detail">
-                                    <span class="software-label">Version:</span>
-                                    <span class="software-value">${software.version}</span>
-                                </div>
-                                ` : ''}
-                                ${software.licenseKey ? `
-                                <div class="software-detail">
-                                    <span class="software-label">License Key:</span>
-                                    <span class="software-value">${software.licenseKey}</span>
-                                </div>
-                                ` : ''}
-                                ${software.licensedTo ? `
-                                <div class="software-detail">
-                                    <span class="software-label">Licensed To:</span>
-                                    <span class="software-value">${software.licensedTo}</span>
-                                </div>
-                                ` : ''}
-                                ${software.expiryDate ? `
-                                <div class="software-detail">
-                                    <span class="software-label">Expiry Date:</span>
-                                    <span class="software-value">${software.expiryDate}</span>
-                                </div>
-                                ` : ''}
-                                ${software.notes ? `
-                                <div class="software-detail">
-                                    <span class="software-label">Notes:</span>
-                                    <span class="software-value">${software.notes}</span>
-                                </div>
-                                ` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
             document.getElementById('deviceDetailsContent').innerHTML = `
                 <div class="device-grid">
                     <div class="device-section">
-                        <h3><i class="fas fa-info-circle"></i> ${deviceTypeName} Information</h3>
+                        <h3><i class="fas fa-info-circle"></i> Device Information</h3>
                         <div class="device-item">
                             <div class="device-label"><i class="fas fa-hashtag"></i> Device Number:</div>
                             <div class="device-value">${device.pcNumber || 'N/A'}</div>
                         </div>
                         <div class="device-item">
-                            <div class="device-label"><i class="fas fa-tag"></i> Device Type:</div>
-                            <div class="device-value">${getDeviceTypeBadge(deviceType)}</div>
+                            <div class="device-label"><i class="fas fa-laptop"></i> PC Model:</div>
+                            <div class="device-value">${device.pcModel || 'N/A'}</div>
                         </div>
-                        ${deviceTypeInfo}
+                        <div class="device-item">
+                            <div class="device-label"><i class="fas fa-barcode"></i> PC Serial:</div>
+                            <div class="device-value">${device.pcSerial || 'N/A'}</div>
+                        </div>
                         <div class="device-item">
                             <div class="device-label"><i class="fas fa-building"></i> Department:</div>
                             <div class="device-value">${device.department || 'N/A'}</div>
@@ -4304,32 +3967,156 @@
                         </div>
                     </div>
                     
-                    ${(deviceType === 'pc' || deviceType === 'laptop' || deviceType === 'printer' || deviceType === 'network-switch' || deviceType === 'server') && networkInterfacesHTML ? `
+                    ${device.networkInterfaces && device.networkInterfaces.length > 0 ? `
                     <div class="device-section">
                         <h3><i class="fas fa-network-wired"></i> Network Information</h3>
-                        ${networkInterfacesHTML}
+                        <div class="network-interfaces-grid">
+                            ${device.networkInterfaces.map(iface => `
+                                <div class="network-interface-card">
+                                    <h4><i class="fas fa-network-wired"></i> ${iface.interfaceName || 'Network Interface'}</h4>
+                                    <div class="interface-detail">
+                                        <span class="interface-label">IP Address:</span>
+                                        <span class="interface-value">${iface.ipAddress || 'N/A'}</span>
+                                    </div>
+                                    ${iface.subnetMask ? `
+                                    <div class="interface-detail">
+                                        <span class="interface-label">Subnet Mask:</span>
+                                        <span class="interface-value">${iface.subnetMask}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${iface.gateway ? `
+                                    <div class="interface-detail">
+                                        <span class="interface-label">Gateway:</span>
+                                        <span class="interface-value">${iface.gateway}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${iface.macAddress ? `
+                                    <div class="interface-detail">
+                                        <span class="interface-label">MAC Address:</span>
+                                        <span class="interface-value">${iface.macAddress}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${iface.type ? `
+                                    <div class="interface-detail">
+                                        <span class="interface-label">Type:</span>
+                                        <span class="interface-value">${iface.type.charAt(0).toUpperCase() + iface.type.slice(1)}</span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                     ` : ''}
                     
-                    ${deviceType === 'pc' && monitorsHTML ? `
+                    ${device.monitors && device.monitors.length > 0 ? `
                     <div class="device-section">
                         <h3><i class="fas fa-tv"></i> Monitors</h3>
-                        ${monitorsHTML}
+                        <div class="monitors-grid">
+                            ${device.monitors.map((monitor, index) => `
+                                <div class="monitor-card">
+                                    <h4><i class="fas fa-tv"></i> Monitor ${index + 1}</h4>
+                                    <div class="monitor-detail">
+                                        <span class="monitor-label">Model:</span>
+                                        <span class="monitor-value">${monitor.model || 'N/A'}</span>
+                                    </div>
+                                    <div class="monitor-detail">
+                                        <span class="monitor-label">Serial:</span>
+                                        <span class="monitor-value">${monitor.serial || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                     ` : ''}
                     
-                    ${(deviceType === 'pc' || deviceType === 'laptop' || deviceType === 'server') && softwareLicensesHTML ? `
+                    ${device.softwareLicenses && device.softwareLicenses.length > 0 ? `
                     <div class="device-section">
                         <h3><i class="fas fa-copyright"></i> Licensed Software</h3>
-                        ${softwareLicensesHTML}
+                        <div class="software-grid">
+                            ${device.softwareLicenses.map(software => `
+                                <div class="software-card">
+                                    <h4><i class="fas fa-copyright"></i> ${software.name || 'Unnamed Software'}</h4>
+                                    ${software.version ? `
+                                    <div class="software-detail">
+                                        <span class="software-label">Version:</span>
+                                        <span class="software-value">${software.version}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${software.licenseKey ? `
+                                    <div class="software-detail">
+                                        <span class="software-label">License Key:</span>
+                                        <span class="software-value">${software.licenseKey}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${software.licensedTo ? `
+                                    <div class="software-detail">
+                                        <span class="software-label">Licensed To:</span>
+                                        <span class="software-value">${software.licensedTo}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${software.expiryDate ? `
+                                    <div class="software-detail">
+                                        <span class="software-label">Expiry Date:</span>
+                                        <span class="software-value">${software.expiryDate}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${software.notes ? `
+                                    <div class="software-detail">
+                                        <span class="software-label">Notes:</span>
+                                        <span class="software-value">${software.notes}</span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                     ` : ''}
                 </div>
                 
-                ${specsGrid ? `
+                ${(device.cpu || device.ram || device.storage) ? `
                 <div class="device-section">
                     <h3><i class="fas fa-microchip"></i> Specifications</h3>
-                    ${specsGrid}
+                    <div class="specs-grid-modal">
+                        ${device.cpu ? `
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div class="spec-name">CPU</div>
+                            <div class="spec-value">${device.cpu}</div>
+                        </div>
+                        ` : ''}
+                        
+                        ${device.gpu ? `
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="spec-name">GPU</div>
+                            <div class="spec-value">${device.gpu}</div>
+                        </div>
+                        ` : ''}
+                        
+                        ${device.ram ? `
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                            <div class="spec-name">RAM</div>
+                            <div class="spec-value">${device.ram}</div>
+                        </div>
+                        ` : ''}
+                        
+                        ${device.storage ? `
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                            <div class="spec-name">Storage</div>
+                            <div class="spec-value">${device.storage}</div>
+                        </div>
+                        ` : ''}
+                    </div>
                 </div>
                 ` : ''}
                 
@@ -4433,14 +4220,10 @@
                 `;
             }
             
-            const deviceType = device.deviceType || 'pc';
-            const deviceModel = getDeviceModel(device);
-            
             document.getElementById('repairHistoryModalContent').innerHTML = `
                 <div style="padding: 20px;">
                     <div style="background: var(--secondary-light); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid var(--primary-color);">
-                        <p><strong>Device:</strong> ${device.pcNumber} - ${deviceModel}</p>
-                        <p><strong>Type:</strong> ${deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}</p>
+                        <p><strong>Device:</strong> ${device.pcNumber} - ${getDeviceModel(device)}</p>
                         <p><strong>Department:</strong> ${device.department}</p>
                         <p><strong>Status:</strong> ${device.status}</p>
                         <p><strong>Total Records:</strong> ${(device.failureReport ? 1 : 0) + repairHistory.length}</p>
@@ -4498,16 +4281,13 @@
             if (!device) return;
             
             currentDeviceId = deviceId;
-            const deviceModel = getDeviceModel(device);
-            const deviceType = device.deviceType || 'pc';
             
             document.getElementById('markFixedModalContent').innerHTML = `
                 <div style="padding: 20px;">
                     <p>Mark device as fixed:</p>
                     <div style="background: var(--secondary-light); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid var(--primary-color);">
                         <p><strong>Device Number:</strong> ${device.pcNumber}</p>
-                        <p><strong>Device Type:</strong> ${deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}</p>
-                        <p><strong>Model:</strong> ${deviceModel}</p>
+                        <p><strong>Model:</strong> ${getDeviceModel(device)}</p>
                         <p><strong>Department:</strong> ${device.department}</p>
                         <p><strong>Failure Reason:</strong> ${device.failureReport?.reason?.substring(0, 100) || 'No reason provided'}...</p>
                     </div>
@@ -4602,10 +4382,9 @@
             currentDeviceId = deviceId;
             isEditMode = true;
             
-            const deviceType = device.deviceType || 'pc';
-            
-            document.getElementById('deviceType').value = deviceType;
             document.getElementById('pcNumber').value = device.pcNumber || '';
+            document.getElementById('pcModel').value = device.pcModel || '';
+            document.getElementById('pcSerial').value = device.pcSerial || '';
             document.getElementById('department').value = device.department || '';
             document.getElementById('userName').value = device.userName || '';
             document.getElementById('status').value = device.status || 'active';
@@ -4613,23 +4392,6 @@
             document.getElementById('gpu').value = device.gpu || '';
             document.getElementById('ram').value = device.ram || '';
             document.getElementById('storage').value = device.storage || '';
-            
-            if (deviceType === 'pc') {
-                document.getElementById('pcModel').value = device.pcModel || '';
-                document.getElementById('pcSerial').value = device.pcSerial || '';
-            } else if (deviceType === 'laptop') {
-                document.getElementById('laptopModel').value = device.laptopModel || '';
-                document.getElementById('laptopSerial').value = device.laptopSerial || '';
-            } else if (deviceType === 'printer') {
-                document.getElementById('printerModel').value = device.printerModel || '';
-                document.getElementById('printerSerial').value = device.printerSerial || '';
-            } else if (deviceType === 'network-switch') {
-                document.getElementById('switchModel').value = device.switchModel || '';
-                document.getElementById('switchSerial').value = device.switchSerial || '';
-            } else if (deviceType === 'server') {
-                document.getElementById('serverModel').value = device.serverModel || '';
-                document.getElementById('serverSerial').value = device.serverSerial || '';
-            }
             
             networkInterfacesList.innerHTML = '';
             if (device.networkInterfaces && device.networkInterfaces.length > 0) {
@@ -4678,8 +4440,6 @@
                 softwareLicensesList.appendChild(defaultSoftware);
             }
             
-            toggleDeviceTypeFields();
-            
             sidebarItems.forEach(i => i.classList.remove('active'));
             document.querySelector('[data-section="addDevice"]').classList.add('active');
             
@@ -4704,16 +4464,13 @@
             if (!device) return;
             
             currentDeviceId = deviceId;
-            const deviceModel = getDeviceModel(device);
-            const deviceType = device.deviceType || 'pc';
             
             document.getElementById('deleteModalContent').innerHTML = `
                 <div style="padding: 20px;">
                     <p>Are you sure you want to delete this device?</p>
                     <div style="background: var(--secondary-light); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid var(--danger-color);">
                         <p><strong>Device Number:</strong> ${device.pcNumber}</p>
-                        <p><strong>Device Type:</strong> ${deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}</p>
-                        <p><strong>Model:</strong> ${deviceModel}</p>
+                        <p><strong>Model:</strong> ${getDeviceModel(device)}</p>
                         <p><strong>Department:</strong> ${device.department}</p>
                         <p><strong>User:</strong> ${device.userName || 'N/A'}</p>
                     </div>
@@ -4754,7 +4511,6 @@
                 
                 if (success) {
                     const deviceModel = getDeviceModel(device);
-                    const deviceType = device.deviceType || 'pc';
                     await addLogEntry('Device Deleted', 
                         `Deleted ${device.pcNumber} (${deviceModel}) from ${device.department}`);
                 }
@@ -4772,14 +4528,14 @@
             saveDeviceBtn.disabled = true;
             saveDeviceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             
-            const deviceType = document.getElementById('deviceType').value;
             const networkInterfaces = collectNetworkInterfacesData();
             const softwareLicenses = collectSoftwareLicensesData();
-            const monitors = deviceType === 'pc' ? collectMonitorsData() : [];
+            const monitors = collectMonitorsData();
             
             const deviceData = {
                 pcNumber: document.getElementById('pcNumber').value.trim(),
-                deviceType: deviceType,
+                pcModel: document.getElementById('pcModel').value.trim(),
+                pcSerial: document.getElementById('pcSerial').value.trim(),
                 department: document.getElementById('department').value,
                 userName: document.getElementById('userName').value.trim(),
                 status: document.getElementById('status').value,
@@ -4789,32 +4545,10 @@
                 site: currentSite.name
             };
             
-            if (deviceType === 'pc') {
-                deviceData.pcModel = document.getElementById('pcModel').value.trim();
-                deviceData.pcSerial = document.getElementById('pcSerial').value.trim();
-                deviceData.cpu = document.getElementById('cpu').value.trim();
-                deviceData.gpu = document.getElementById('gpu').value.trim();
-                deviceData.ram = document.getElementById('ram').value.trim();
-                deviceData.storage = document.getElementById('storage').value.trim();
-            } else if (deviceType === 'laptop') {
-                deviceData.laptopModel = document.getElementById('laptopModel').value.trim();
-                deviceData.laptopSerial = document.getElementById('laptopSerial').value.trim();
-                deviceData.cpu = document.getElementById('cpu').value.trim();
-                deviceData.ram = document.getElementById('ram').value.trim();
-                deviceData.storage = document.getElementById('storage').value.trim();
-            } else if (deviceType === 'printer') {
-                deviceData.printerModel = document.getElementById('printerModel').value.trim();
-                deviceData.printerSerial = document.getElementById('printerSerial').value.trim();
-            } else if (deviceType === 'network-switch') {
-                deviceData.switchModel = document.getElementById('switchModel').value.trim();
-                deviceData.switchSerial = document.getElementById('switchSerial').value.trim();
-            } else if (deviceType === 'server') {
-                deviceData.serverModel = document.getElementById('serverModel').value.trim();
-                deviceData.serverSerial = document.getElementById('serverSerial').value.trim();
-                deviceData.cpu = document.getElementById('cpu').value.trim();
-                deviceData.ram = document.getElementById('ram').value.trim();
-                deviceData.storage = document.getElementById('storage').value.trim();
-            }
+            deviceData.cpu = document.getElementById('cpu').value.trim();
+            deviceData.gpu = document.getElementById('gpu').value.trim();
+            deviceData.ram = document.getElementById('ram').value.trim();
+            deviceData.storage = document.getElementById('storage').value.trim();
             
             if (networkInterfaces.length > 0) {
                 deviceData.ipAddress = networkInterfaces[0].ipAddress || '';
@@ -4827,11 +4561,7 @@
                     const success = await updateDeviceInFirebase(currentDeviceId, deviceData);
                     
                     if (success) {
-                        const deviceModel = deviceType === 'pc' ? deviceData.pcModel : 
-                                          deviceType === 'laptop' ? deviceData.laptopModel :
-                                          deviceType === 'printer' ? deviceData.printerModel :
-                                          deviceType === 'network-switch' ? deviceData.switchModel :
-                                          deviceData.serverModel;
+                        const deviceModel = getDeviceModel(deviceData);
                         await addLogEntry('Device Edited', 
                             `Updated ${deviceData.pcNumber} (${deviceModel})`);
                     }
@@ -4839,11 +4569,7 @@
                     const newDeviceId = await saveDeviceToFirebase(deviceData);
                     
                     if (newDeviceId) {
-                        const deviceModel = deviceType === 'pc' ? deviceData.pcModel : 
-                                          deviceType === 'laptop' ? deviceData.laptopModel :
-                                          deviceType === 'printer' ? deviceData.printerModel :
-                                          deviceType === 'network-switch' ? deviceData.switchModel :
-                                          deviceData.serverModel;
+                        const deviceModel = getDeviceModel(deviceData);
                         await addLogEntry('Device Added', 
                             `Added ${deviceData.pcNumber} (${deviceModel}) to ${deviceData.department}`);
                     }
@@ -4863,6 +4589,7 @@
                 
             } catch (error) {
                 console.error("Error saving device:", error);
+                alert("Error saving device: " + error.message);
             } finally {
                 saveDeviceBtn.disabled = false;
                 saveDeviceBtn.innerHTML = '<i class="fas fa-save"></i> Save Device';
@@ -4968,7 +4695,8 @@
                 
                 const newDeviceData = {
                     pcNumber: newPcNumber,
-                    deviceType: oldDevice.deviceType || 'pc',
+                    pcModel: newPcModel,
+                    pcSerial: newSerial,
                     department: oldDevice.department || '',
                     userName: oldDevice.userName || '',
                     status: 'active',
@@ -4979,32 +4707,10 @@
                     site: currentSite.name
                 };
                 
-                if (oldDevice.deviceType === 'pc') {
-                    newDeviceData.pcModel = newPcModel;
-                    newDeviceData.pcSerial = newSerial;
-                    newDeviceData.cpu = oldDevice.cpu || '';
-                    newDeviceData.gpu = oldDevice.gpu || '';
-                    newDeviceData.ram = oldDevice.ram || '';
-                    newDeviceData.storage = oldDevice.storage || '';
-                } else if (oldDevice.deviceType === 'laptop') {
-                    newDeviceData.laptopModel = newPcModel;
-                    newDeviceData.laptopSerial = newSerial;
-                    newDeviceData.cpu = oldDevice.cpu || '';
-                    newDeviceData.ram = oldDevice.ram || '';
-                    newDeviceData.storage = oldDevice.storage || '';
-                } else if (oldDevice.deviceType === 'printer') {
-                    newDeviceData.printerModel = newPcModel;
-                    newDeviceData.printerSerial = newSerial;
-                } else if (oldDevice.deviceType === 'network-switch') {
-                    newDeviceData.switchModel = newPcModel;
-                    newDeviceData.switchSerial = newSerial;
-                } else if (oldDevice.deviceType === 'server') {
-                    newDeviceData.serverModel = newPcModel;
-                    newDeviceData.serverSerial = newSerial;
-                    newDeviceData.cpu = oldDevice.cpu || '';
-                    newDeviceData.ram = oldDevice.ram || '';
-                    newDeviceData.storage = oldDevice.storage || '';
-                }
+                newDeviceData.cpu = oldDevice.cpu || '';
+                newDeviceData.gpu = oldDevice.gpu || '';
+                newDeviceData.ram = oldDevice.ram || '';
+                newDeviceData.storage = oldDevice.storage || '';
                 
                 const newDeviceId = await saveDeviceToFirebase(newDeviceData);
                 
@@ -5133,10 +4839,12 @@
             isEditMode = false;
             currentDeviceId = null;
             document.querySelector('#addDevice h2').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Device';
-            document.getElementById('deviceType').value = 'pc';
             document.getElementById('department').value = '';
             document.getElementById('status').value = 'active';
-            toggleDeviceTypeFields();
+            document.getElementById('cpu').value = '';
+            document.getElementById('gpu').value = '';
+            document.getElementById('ram').value = '';
+            document.getElementById('storage').value = '';
             addDefaultNetworkInterface();
             addDefaultMonitor();
             addDefaultSoftwareLicense();
@@ -5255,8 +4963,6 @@
                 window.open(currentSite.networkDiagram, '_blank');
             }
         });
-
-        deviceTypeSelect.addEventListener('change', toggleDeviceTypeFields);
         
         addNetworkInterfaceBtn.addEventListener('click', function() {
             const interfaceCount = document.querySelectorAll('.network-interface').length;
@@ -5308,10 +5014,12 @@
             console.log("🎨 Theme: WTC Teal Theme (Both Sites)");
             console.log("🌐 Timezone: Sri Lanka Time (Local Browser Time)");
             console.log("🔗 Firebase Project: inventory-3650f");
-            console.log("📊 Excel Support: Import/Export with SheetJS");
-            console.log("⚡ Features: Multi-site, Excel Import/Export, Switch Site, Multiple Device Types");
+            console.log("📊 Excel Support: Import/Export with SheetJS - Department Grouping Enabled");
+            console.log("⚡ Features: Multi-site, Excel Import/Export, Switch Site");
             console.log("📝 Activity Logs: Site-specific logging enabled");
             console.log("⌨️ Enter Key Navigation: Enabled for forms");
+            console.log("🔍 Search: Searches all device serials, monitor serials, and license keys");
+            console.log("ℹ️ Device Type Selection: REMOVED - System now supports only PCs");
             
             const currentTime = getSriLankaTime();
             console.log("🕒 Current Sri Lanka Time:", formatSriLankaTimestamp(currentTime));
@@ -5329,148 +5037,6 @@
             
             usernameInput.focus();
         });
-
-        // ============================================
-        // IMPORT DEVICE DATA FUNCTION
-        // ============================================
-        async function importDeviceData() {
-            if (!currentSite || currentSite.name !== 'WTC') {
-                console.log("❌ Import only available for WTC site");
-                return;
-            }
-
-            console.log("🚀 Starting import of device data...");
-            
-            const departments = {
-                'NEWS': [
-                    {pcNumber: 'PC-01', pcModel: 'HP Z240 Tower Workstation', pcSerial: 'SGH745RQ47', monitorModel: 'ViewSonic VA2719-sh', monitorSerial: 'UNR175021110'},
-                    {pcNumber: 'PC-02', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZB0', monitorModel: 'HP V242', monitorSerial: 'CNK6051BQ1'},
-                    {pcNumber: 'PC-03', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KN9', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK847002F'},
-                    {pcNumber: 'PC-04', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KNF', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK847001X'},
-                    {pcNumber: 'PC-05', pcModel: 'ASUS Assembled', pcSerial: '191059536400252', monitorModel: 'DELL SE2419HR', monitorSerial: 'C61GX03'},
-                    {pcNumber: 'PC-06', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KND', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK80302LC'},
-                    {pcNumber: 'PC-07', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KMZ', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK80302K9'},
-                    {pcNumber: 'PC-08', pcModel: 'HP Z240 Tower Workstation', pcSerial: 'SGH745RQ4B', monitorModel: 'DELL SE2419HR', monitorSerial: '7YG7RZ2'},
-                    {pcNumber: 'PC-09', pcModel: 'ASUS Assembled', pcSerial: '191059536402119', monitorModel: 'DELL SE2419HR', monitorSerial: 'FCCZW03'},
-                    {pcNumber: 'PC-10', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZBP', monitorModel: 'HP V242', monitorSerial: 'CNK6051BQ2'},
-                    {pcNumber: 'PC-11', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KN2', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK84700X4'},
-                    {pcNumber: 'PC-12', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZBM', monitorModel: 'HP V194', monitorSerial: '3CQ0370BJB'},
-                    {pcNumber: 'PC-13', pcModel: 'ASUS Assembled', pcSerial: '191059536401137', monitorModel: 'DELL SE2419HR', monitorSerial: 'CHDZW03'},
-                    {pcNumber: 'PC-14', pcModel: 'ASUS Assembled', pcSerial: '191059536400215', monitorModel: 'DELL SE2419HR', monitorSerial: '7HDZW03'},
-                    {pcNumber: 'PC-15', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZ9N', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK84700X0'},
-                    {pcNumber: 'PC-16', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH217Q8WX', monitorModel: 'HP V242', monitorSerial: 'CNK6051CKZ'},
-                    {pcNumber: 'PC-17', pcModel: 'ASUS Assembled', pcSerial: '191059536403167', monitorModel: 'DELL SE2419HR', monitorSerial: 'GH0GX03'},
-                    {pcNumber: 'PC-18', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH217Q8WP', monitorModel: 'HP V242', monitorSerial: 'CNK6051CKY'},
-                    {pcNumber: 'PC-19', pcModel: 'HP Pro 3090 MT', pcSerial: 'SGH203R0GW', monitorModel: 'HP V242', monitorSerial: 'CNK6051CKK'},
-                    {pcNumber: 'PC-20', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KQ1', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK84700WZ'},
-                    {pcNumber: 'PC-21', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KPR', monitorModel: 'HP ProDisplay P240va', monitorSerial: 'CNK8470025'},
-                    {pcNumber: 'PC-22', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KMR', monitorModel: 'HP V242', monitorSerial: 'CNK6051CKX'},
-                    {pcNumber: 'PC-23', pcModel: 'HP ProDesk 600 G2 MT', pcSerial: 'SGH623QRSW', monitorModel: 'HP V242', monitorSerial: 'CNK6051BQ3'},
-                    {pcNumber: 'PC-24', pcModel: 'HP ProDesk 600 G2 MT', pcSerial: 'SGH623QRTX', monitorModel: 'DELL SE2419HR', monitorSerial: '3DCZW03'},
-                    {pcNumber: 'PC-25', pcModel: 'ASUS Assembled', pcSerial: '191059536401706', monitorModel: 'DELL SE2419HR', monitorSerial: '8YG7RZ2'},
-                    {pcNumber: 'PC-26', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KQ0', monitorModel: 'HP V194', monitorSerial: '3CQ037082G'},
-                    {pcNumber: 'PC-27', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH217Q8T3', monitorModel: 'HP LV1911', monitorSerial: '6CM2050BR4'},
-                    {pcNumber: 'PC-28', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH251TBDL', monitorModel: 'HP LV1911', monitorSerial: '6CM20601FZ'},
-                    {pcNumber: 'PC-29', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZ85', monitorModel: 'DELL SE2419HR', monitorSerial: 'B41GX03'},
-                    {pcNumber: 'PC-30', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH217Q8QM', monitorModel: 'HP LV1911', monitorSerial: '6CM214050VV'},
-                    {pcNumber: 'PC-31', pcModel: 'HP Z240 Tower Workstation', pcSerial: 'SGH745RQ4D', monitorModel: 'DELL SE2419HR', monitorSerial: '1L0GX03'},
-                    {pcNumber: 'PC-32', pcModel: 'ASUS Assembled', pcSerial: '190957657500189', monitorModel: 'DELL SE2419HR', monitorSerial: 'CK0GX03'},
-                    {pcNumber: 'PC-33', pcModel: 'HP 280 Pro G6 Microtower', pcSerial: '4CE0392KP0', monitorModel: 'HP V242', monitorSerial: 'CNK6051BQ7'},
-                    {pcNumber: 'PC-34', pcModel: 'ASUS Assembled', pcSerial: '191059536400213', monitorModel: 'DELL SE2419HR', monitorSerial: '2YG7RZ2'},
-                    {pcNumber: 'PC-35', pcModel: 'HP ProDesk 600 G2 MT', pcSerial: 'SGH623QRTS', monitorModel: 'ViewSonic VA2465', monitorSerial: 'U9B153600257'},
-                    {pcNumber: 'PC-36', pcModel: 'HP Pro 3090 MT', pcSerial: 'SGH203R0GY', monitorModel: 'HP LV2011', monitorSerial: 'CNC634P5ZM'}
-                ],
-                'Transmission': [
-                    {pcNumber: 'PC-01', pcModel: 'HP ProDesk 600 G2 SFF', pcSerial: 'SGH641TM9C', monitorModel: 'HP LV1911', monitorSerial: '6CM2100MYK'},
-                    {pcNumber: 'PC-02', pcModel: 'HP Compaq 6200 Pro MicroTower', pcSerial: 'SGH210PZBY', monitorModel: 'E-WIS EW 195', monitorSerial: ''},
-                    {pcNumber: 'PC-03', pcModel: 'HP Pro 3300 Series MT', pcSerial: 'SGH209PR29', monitorModel: 'HP V193', monitorSerial: '3CQ4463S7V'}
-                ],
-                'GFX': [
-                    {pcNumber: 'PC-01', pcModel: 'HP Z620 Workstation', pcSerial: 'SGH445Q8Z7', monitorModel: 'ASUS VS278', monitorSerial: 'FALMQS047851'},
-                    {pcNumber: 'PC-02', pcModel: 'Micro Z370 PC PRO', pcSerial: 'HC16114121', monitorModel: 'HP HP 24mh', monitorSerial: '3CM1261KFB'},
-                    {pcNumber: 'PC-03', pcModel: 'HP Z8 G4 Workstation', pcSerial: '4CE04520CJ', monitorModel: 'HP HP V242', monitorSerial: 'CNK6051BPZ'},
-                    {pcNumber: 'PC-04', pcModel: 'Micro Z370 PC PRO', pcSerial: 'HC16114130', monitorModel: 'HP HP 27fw', monitorSerial: '3CM9460NWZ'},
-                    {pcNumber: 'PC-05', pcModel: 'ASUS Assembled', pcSerial: '191263405100710', monitorModel: 'ViewSonic VA2719', monitorSerial: 'UNR175021101'},
-                    {pcNumber: 'PC-06', pcModel: 'ASUS Assembled', pcSerial: '191059536400696', monitorModel: 'ViewSonic VA2719', monitorSerial: 'UNR175021115'},
-                    {pcNumber: 'PC-07', pcModel: 'ASUS Assembled', pcSerial: '191263405100224', monitorModel: 'ViewSonic VA2719', monitorSerial: 'UNR175021160'}
-                ],
-                'PCR2': [
-                    {pcNumber: 'PC-01', pcModel: 'HP HP Z2 Tower G4 Workstation', pcSerial: '4CE0522DKR', monitorModel: 'HP HPN HP Z24nf G2', monitorSerial: '6CM0020XFH'},
-                    {pcNumber: 'PC-02', pcModel: 'HP HP Z4 G4 Workstation', pcSerial: '4CE04823HF', monitorModel: 'HP HP 22fw', monitorSerial: '3CM9381CWF'},
-                    {pcNumber: 'PC-03', pcModel: 'DELL OptiPlex XE3', pcSerial: 'GSDZ233', monitorModel: 'DELL P2418HT', monitorSerial: 'XX-0TNDG7-XXXXX-09I-CQF'},
-                    {pcNumber: 'PC-04', pcModel: 'HP HP Z8 G4 Workstation', pcSerial: '4CE045202X', monitorModel: 'HP HP 22fw', monitorSerial: '3CM9381DN3'},
-                    {pcNumber: 'PC-05', pcModel: 'HP HP 280 Pro G6 Microtower PC', pcSerial: '4CE0392KKJ', monitorModel: 'HP HP Z24nf G2', monitorSerial: '6CM0020XFL'},
-                    {pcNumber: 'PC-06', pcModel: 'HP HP 280 Pro G6 Microtower PC', pcSerial: '4CE0392KLQ', monitorModel: 'HP V194', monitorSerial: '3CQ0370DP0'},
-                    {pcNumber: 'PC-07', pcModel: 'HP HP Z4 G4 Workstation', pcSerial: '4CE04828ND', monitorModel: 'HP HP 22fw', monitorSerial: '3CM9381DN0'}
-                ],
-                'Marketing C': [
-                    {pcNumber: 'PC-01', pcModel: 'Assembled', pcSerial: 'BTWW1450287V', monitorModel: 'HP Compaq LE1902x', monitorSerial: 'CNT14634PM'},
-                    {pcNumber: 'PC-02', pcModel: 'HP ProDesk 600 G2 SFF', pcSerial: 'SGH637QNXW', monitorModel: 'HP LV1911', monitorSerial: '6CM20601B2'},
-                    {pcNumber: 'PC-03', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210Q8VN', monitorModel: 'Samsung SMS19A100', monitorSerial: 'ZTRRHMBCA00733'}
-                ],
-                'Scheduling': [
-                    {pcNumber: 'PC-01', pcModel: 'HP Pro 3300 Series MT', pcSerial: 'SGH216Q0P4', monitorModel: 'HP LE1851w', monitorSerial: 'CNC123P6NC'},
-                    {pcNumber: 'PC-02', pcModel: 'HP ProDesk 600 G2 SFF', pcSerial: 'SGH641TM93', monitorModel: 'HP LV1911', monitorSerial: '6CM2050CRP'},
-                    {pcNumber: 'PC-03', pcModel: 'DELL VOSTRO 3670', pcSerial: '6DTG9V2', monitorModel: 'HP V193', monitorSerial: '3CQ4432BNS'},
-                    {pcNumber: 'PC-04', pcModel: 'HP ProDesk 600 G1 TWR', pcSerial: 'SGH536T3MJ', monitorModel: 'HP V193b', monitorSerial: '3CQ52816N2'},
-                    {pcNumber: 'PC-05', pcModel: 'HP Compaq 8200 Elite CMT', pcSerial: 'SGH133R6RD', monitorModel: 'HP LE1851w', monitorSerial: 'CNC123P7XW'},
-                    {pcNumber: 'Pc-06', pcModel: 'HP ProDesk 600 G2 SFF', pcSerial: 'SGH641TM9P', monitorModel: 'HP LV2011', monitorSerial: 'CNC634P79R'},
-                    {pcNumber: 'PC-07', pcModel: 'HP Compaq Pro 6300 MT', pcSerial: 'SGH303QQY0', monitorModel: 'SAMSUNG SyncMaster', monitorSerial: 'MY19HMDZ406496'}
-                ],
-                'Political': [
-                    {pcNumber: 'PC-01', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH217Q8RW', monitorModel: 'E-wis EW 195', monitorSerial: ''},
-                    {pcNumber: 'PC-02', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZBK', monitorModel: 'ViewSonic VX2453', monitorSerial: 'SDA112816434'},
-                    {pcNumber: 'PC-03', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH210PZBN', monitorModel: 'DELL SE2419HR', monitorSerial: '8HDZW03'},
-                    {pcNumber: 'PC-04', pcModel: 'HP Compaq6200 pro microtower', pcSerial: 'SGH217Q8QL', monitorModel: 'HP V242', monitorSerial: 'CNK6051CKS'},
-                    {pcNumber: 'PC-05', pcModel: 'HP Z400 Workstation', pcSerial: 'SGH205RL2V', monitors: [
-                        {model: 'HP ZR2240w', serial: 'CN414412G4'},
-                        {model: 'E-wis EW 195', serial: 'EW195N7664'}
-                    ]}
-                ]
-            };
-            
-            let importedCount = 0;
-            let errorCount = 0;
-            
-            for (const [department, devices] of Object.entries(departments)) {
-                for (const deviceData of devices) {
-                    try {
-                        const device = {
-                            pcNumber: deviceData.pcNumber,
-                            deviceType: 'pc',
-                            pcModel: deviceData.pcModel,
-                            pcSerial: deviceData.pcSerial,
-                            department: department,
-                            status: 'active',
-                            monitors: deviceData.monitors || [{model: deviceData.monitorModel, serial: deviceData.monitorSerial}],
-                            networkInterfaces: [],
-                            softwareLicenses: [],
-                            createdBy: currentUser,
-                            site: currentSite.name
-                        };
-                        
-                        await saveDeviceToFirebase(device);
-                        importedCount++;
-                        console.log(`✅ Imported ${device.pcNumber} - ${device.pcModel} to ${department}`);
-                        
-                    } catch (error) {
-                        errorCount++;
-                        console.error(`❌ Error importing ${deviceData.pcNumber}:`, error);
-                    }
-                }
-            }
-            
-            console.log(`🎉 Import complete! Successfully imported ${importedCount} devices, ${errorCount} errors.`);
-            
-            if (importedCount > 0) {
-                await addLogEntry('Data Import', `Imported ${importedCount} devices to WTC database`);
-                alert(`Successfully imported ${importedCount} devices to WTC database!`);
-                
-                loadInventoryFromFirebase();
-            }
-        }
-
-
 
     </script>
 </body>
