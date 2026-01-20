@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1650,7 +1649,7 @@
                         
                         <div class="excel-actions">
                             <button class="btn btn-excel" id="exportAllBtn">
-                                <i class="fas fa-file-export"></i> Export All Devices (Grouped by Department)
+                                <i class="fas fa-file-export"></i> Export All Devices
                             </button>
                             <button class="btn btn-success" id="exportActiveBtn">
                                 <i class="fas fa-file-export"></i> Export Active Devices
@@ -1700,10 +1699,11 @@
                             <h4><i class="fas fa-info-circle"></i> Import Instructions</h4>
                             <ol style="margin-left: 20px; margin-top: 10px; color: var(--text-gray);">
                                 <li>Download the template above to see the required format</li>
-                                <li>Required columns: PC Number, PC Model, PC Serial, Department</li>
+                                <li>Required columns: Device Number, PC Model, PC Serial, Department</li>
                                 <li>Optional columns: User Name, CPU, GPU, RAM, Storage, Monitor Model, Monitor Serial, Status</li>
                                 <li>Status can be: active, failed, or replaced</li>
                                 <li>Maximum 100 devices per import</li>
+                                <li>All data should be in a single sheet named "Devices"</li>
                             </ol>
                         </div>
                     </div>
@@ -2137,119 +2137,8 @@
         }
 
         // ============================================
-        // EXCEL IMPORT/EXPORT FUNCTIONS - UPDATED (Device Type Removed)
+        // EXCEL IMPORT/EXPORT FUNCTIONS - SINGLE SHEET
         // ============================================
-        function exportToExcelGroupedByDepartment(data, filename = 'devices') {
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                // Group devices by department
-                const devicesByDepartment = {};
-                data.forEach(device => {
-                    const department = device.department || 'Unknown';
-                    if (!devicesByDepartment[department]) {
-                        devicesByDepartment[department] = [];
-                    }
-                    devicesByDepartment[department].push(device);
-                });
-                
-                // Sort departments alphabetically
-                const sortedDepartments = Object.keys(devicesByDepartment).sort();
-                
-                // Create a sheet for each department
-                sortedDepartments.forEach((department, index) => {
-                    const departmentDevices = devicesByDepartment[department];
-                    
-                    const excelData = departmentDevices.map(device => {
-                        let networkInfo = 'N/A';
-                        if (device.networkInterfaces && device.networkInterfaces.length > 0) {
-                            networkInfo = device.networkInterfaces.map(iface => 
-                                `${iface.interfaceName || 'Interface'}: ${iface.ipAddress || 'N/A'}`
-                            ).join('; ');
-                        }
-                        
-                        let softwareInfo = 'N/A';
-                        if (device.softwareLicenses && device.softwareLicenses.length > 0) {
-                            softwareInfo = device.softwareLicenses.map(software => 
-                                `${software.name || 'Software'} ${software.version || ''}`
-                            ).join('; ');
-                        }
-                        
-                        let monitorInfo = 'N/A';
-                        if (device.monitors && device.monitors.length > 0) {
-                            monitorInfo = device.monitors.map(monitor => 
-                                `${monitor.model || 'Monitor'}: ${monitor.serial || 'N/A'}`
-                            ).join('; ');
-                        }
-                        
-                        return {
-                            'Device Number': device.pcNumber || 'N/A',
-                            'Model': device.pcModel || 'N/A',
-                            'Serial': device.pcSerial || 'N/A',
-                            'Department': device.department || 'N/A',
-                            'User Name': device.userName || 'N/A',
-                            'IP Address': networkInfo,
-                            'CPU': device.cpu || 'N/A',
-                            'GPU': device.gpu || 'N/A',
-                            'RAM': device.ram || 'N/A',
-                            'Storage': device.storage || 'N/A',
-                            'Monitors': monitorInfo,
-                            'Status': device.status || 'active',
-                            'Software Licenses': softwareInfo,
-                            'Created By': device.createdBy || 'N/A',
-                            'Created Date': device.createdAt ? (device.createdAt.toDate ? device.createdAt.toDate().toLocaleDateString() : device.createdAt) : 'N/A',
-                            'Updated By': device.updatedBy || 'N/A',
-                            'Updated Date': device.updatedAt ? (device.updatedAt.toDate ? device.updatedAt.toDate().toLocaleDateString() : device.updatedAt) : 'N/A'
-                        };
-                    });
-
-                    const ws = XLSX.utils.json_to_sheet(excelData);
-                    
-                    // Add department title at the top
-                    const titleRow = [['DEPARTMENT: ' + department]];
-                    const emptyRow = [['']];
-                    XLSX.utils.sheet_add_aoa(ws, titleRow, { origin: 'A1' });
-                    XLSX.utils.sheet_add_aoa(ws, emptyRow, { origin: 'A2' });
-                    
-                    // Add column headers starting from row 3
-                    const headerRow = [Object.keys(excelData[0] || {})];
-                    XLSX.utils.sheet_add_aoa(ws, headerRow, { origin: 'A3' });
-                    
-                    // Add data starting from row 4
-                    const dataRows = excelData.map(device => Object.values(device));
-                    if (dataRows.length > 0) {
-                        XLSX.utils.sheet_add_aoa(ws, dataRows, { origin: 'A4' });
-                    }
-                    
-                    const wscols = [
-                        { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 20 }, 
-                        { wch: 20 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, 
-                        { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, 
-                        { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, 
-                        { wch: 15 }
-                    ];
-                    ws['!cols'] = wscols;
-                    
-                    // Limit sheet name to 31 characters and make it safe for Excel
-                    let sheetName = department.substring(0, 31).replace(/[\\/*\[\]:?]/g, '');
-                    if (sheetName.length === 0) sheetName = 'Sheet' + (index + 1);
-                    
-                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                });
-                
-                const dateStr = new Date().toISOString().split('T')[0];
-                const exportFilename = `${filename}_${currentSite.name}_${dateStr}.xlsx`;
-                
-                XLSX.writeFile(wb, exportFilename);
-                
-                return true;
-            } catch (error) {
-                console.error("Error exporting to Excel:", error);
-                alert("Error exporting to Excel: " + error.message);
-                return false;
-            }
-        }
-
         function exportToExcel(data, filename = 'devices') {
             try {
                 const excelData = data.map(device => {
@@ -2276,8 +2165,8 @@
                     
                     return {
                         'Device Number': device.pcNumber || 'N/A',
-                        'Model': device.pcModel || 'N/A',
-                        'Serial': device.pcSerial || 'N/A',
+                        'PC Model': device.pcModel || 'N/A',
+                        'PC Serial': device.pcSerial || 'N/A',
                         'Department': device.department || 'N/A',
                         'User Name': device.userName || 'N/A',
                         'IP Address': networkInfo,
@@ -2286,23 +2175,25 @@
                         'RAM': device.ram || 'N/A',
                         'Storage': device.storage || 'N/A',
                         'Monitors': monitorInfo,
-                        'Status': device.status || 'active',
                         'Software Licenses': softwareInfo,
+                        'Status': device.status ? device.status.charAt(0).toUpperCase() + device.status.slice(1) : 'Active',
                         'Created By': device.createdBy || 'N/A',
                         'Created Date': device.createdAt ? (device.createdAt.toDate ? device.createdAt.toDate().toLocaleDateString() : device.createdAt) : 'N/A',
                         'Updated By': device.updatedBy || 'N/A',
-                        'Updated Date': device.updatedAt ? (device.updatedAt.toDate ? device.updatedAt.toDate().toLocaleDateString() : device.updatedAt) : 'N/A'
+                        'Updated Date': device.updatedAt ? (device.updatedAt.toDate ? device.updatedAt.toDate().toLocaleDateString() : device.updatedAt) : 'N/A',
+                        'Site': device.site || currentSite.name
                     };
                 });
 
                 const ws = XLSX.utils.json_to_sheet(excelData);
                 
+                // Set column widths
                 const wscols = [
                     { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 20 }, 
                     { wch: 20 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, 
-                    { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, 
-                    { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, 
-                    { wch: 15 }
+                    { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 30 }, 
+                    { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, 
+                    { wch: 15 }, { wch: 10 }
                 ];
                 ws['!cols'] = wscols;
 
@@ -2327,49 +2218,56 @@
                 const templateData = [
                     {
                         'Device Number': 'PC-001',
-                        'Model': 'Dell OptiPlex 7080',
-                        'Serial': 'ABC123456',
+                        'PC Model': 'Dell OptiPlex 7080',
+                        'PC Serial': 'ABC123456',
                         'Department': 'Engineering',
                         'User Name': 'John Doe',
+                        'IP Address': 'Primary Interface: 192.168.1.10',
                         'CPU': 'Intel i7-10700',
                         'GPU': 'NVIDIA GTX 1660',
                         'RAM': '16GB DDR4',
                         'Storage': '512GB SSD',
                         'Monitors': 'Dell P2419H: MON123456',
-                        'Status': 'active',
                         'Software Licenses': 'Microsoft Office 2021: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX',
-                        'Notes': 'Additional notes here'
+                        'Status': 'Active',
+                        'Created By': 'System',
+                        'Created Date': new Date().toLocaleDateString(),
+                        'Updated By': 'System',
+                        'Updated Date': new Date().toLocaleDateString(),
+                        'Site': currentSite.name
                     }
                 ];
 
                 const ws = XLSX.utils.json_to_sheet(templateData);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Template');
+                XLSX.utils.book_append_sheet(wb, ws, 'Devices');
                 
+                // Add instructions as a separate sheet
                 const instructions = [
                     ['IMPORT INSTRUCTIONS'],
                     [''],
-                    ['1. Required columns: Device Number, Model, Serial, Department'],
-                    ['2. Status can be: active, failed, or replaced'],
+                    ['1. Required columns: Device Number, PC Model, PC Serial, Department'],
+                    ['2. Status can be: Active, Failed, or Replaced'],
                     ['3. All other columns are optional'],
                     ['4. Do not change the column headers'],
                     ['5. Maximum 100 devices per import'],
-                    ['6. Remove this instructions sheet before importing'],
+                    ['6. Save file as Excel (.xlsx) format'],
                     [''],
                     ['COLUMN DESCRIPTIONS'],
                     ['Device Number: Unique identifier (e.g., PC-001)'],
-                    ['Model: Model name/number'],
-                    ['Serial: Serial number of the device'],
+                    ['PC Model: Model name/number'],
+                    ['PC Serial: Serial number of the device'],
                     ['Department: Department where device is located'],
                     ['User Name: Person using the device'],
+                    ['IP Address: Format: InterfaceName:IP; InterfaceName:IP'],
                     ['CPU: Processor specifications'],
                     ['GPU: Graphics card specifications'],
                     ['RAM: Memory specifications'],
                     ['Storage: Storage specifications'],
                     ['Monitors: Format: Model:Serial; Model:Serial'],
-                    ['Status: Device status (active/failed/replaced)'],
                     ['Software Licenses: Format: Software:Key; Software:Key'],
-                    ['Notes: Any additional notes']
+                    ['Status: Device status (Active/Failed/Replaced)'],
+                    ['Site: Automatically filled during import']
                 ];
                 
                 const ws2 = XLSX.utils.aoa_to_sheet(instructions);
@@ -2392,8 +2290,13 @@
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
+                        // Look for a sheet named 'Devices' or use the first sheet
+                        let sheetName = workbook.SheetNames.find(name => 
+                            name.toLowerCase().includes('device') || 
+                            name.toLowerCase().includes('data')
+                        ) || workbook.SheetNames[0];
+                        
+                        const worksheet = workbook.Sheets[sheetName];
                         
                         const jsonData = XLSX.utils.sheet_to_json(worksheet);
                         
@@ -2419,26 +2322,32 @@
                             const rowNum = i + 2;
                             
                             try {
-                                if (!row['Device Number'] || !row['Model'] || !row['Serial'] || !row['Department']) {
-                                    throw new Error("Missing required fields");
+                                // Check required fields (handle different column name variations)
+                                const deviceNumber = row['Device Number'] || row['DeviceNumber'] || row['PC Number'] || row['PCNumber'];
+                                const pcModel = row['PC Model'] || row['PCModel'] || row['Model'];
+                                const pcSerial = row['PC Serial'] || row['PCSerial'] || row['Serial'];
+                                const department = row['Department'] || row['Dept'];
+                                
+                                if (!deviceNumber || !pcModel || !pcSerial || !department) {
+                                    throw new Error(`Missing required fields. Found: Device Number: ${deviceNumber}, Model: ${pcModel}, Serial: ${pcSerial}, Department: ${department}`);
                                 }
                                 
-                                if (!currentSite.departments.includes(row['Department'])) {
+                                if (!currentSite.departments.includes(department)) {
                                     throw new Error(`Invalid department. Valid departments: ${currentSite.departments.join(', ')}`);
                                 }
                                 
-                                const status = row['Status'] || 'active';
-                                if (!['active', 'failed', 'replaced'].includes(status.toLowerCase())) {
-                                    throw new Error("Status must be 'active', 'failed', or 'replaced'");
+                                const status = (row['Status'] || 'active').toLowerCase();
+                                if (!['active', 'failed', 'replaced'].includes(status)) {
+                                    throw new Error("Status must be 'Active', 'Failed', or 'Replaced'");
                                 }
                                 
                                 const deviceData = {
-                                    pcNumber: String(row['Device Number']).trim(),
-                                    pcModel: String(row['Model']).trim(),
-                                    pcSerial: String(row['Serial']).trim(),
-                                    department: String(row['Department']).trim(),
-                                    userName: row['User Name'] ? String(row['User Name']).trim() : '',
-                                    status: status.toLowerCase(),
+                                    pcNumber: String(deviceNumber).trim(),
+                                    pcModel: String(pcModel).trim(),
+                                    pcSerial: String(pcSerial).trim(),
+                                    department: String(department).trim(),
+                                    userName: (row['User Name'] || row['UserName'] || row['User'] || '').toString().trim(),
+                                    status: status,
                                     networkInterfaces: [],
                                     softwareLicenses: [],
                                     monitors: [],
@@ -2446,11 +2355,30 @@
                                     site: currentSite.name
                                 };
                                 
-                                deviceData.cpu = row['CPU'] ? String(row['CPU']).trim() : '';
-                                deviceData.gpu = row['GPU'] ? String(row['GPU']).trim() : '';
-                                deviceData.ram = row['RAM'] ? String(row['RAM']).trim() : '';
-                                deviceData.storage = row['Storage'] ? String(row['Storage']).trim() : '';
+                                // Handle optional fields
+                                deviceData.cpu = (row['CPU'] || '').toString().trim();
+                                deviceData.gpu = (row['GPU'] || '').toString().trim();
+                                deviceData.ram = (row['RAM'] || '').toString().trim();
+                                deviceData.storage = (row['Storage'] || '').toString().trim();
                                 
+                                // Parse network interfaces from IP Address column
+                                if (row['IP Address'] || row['IPAddress']) {
+                                    const ipInfo = String(row['IP Address'] || row['IPAddress'] || '').trim();
+                                    if (ipInfo && ipInfo !== 'N/A') {
+                                        const interfacePairs = ipInfo.split(';').map(pair => pair.trim());
+                                        interfacePairs.forEach(pair => {
+                                            const parts = pair.split(':').map(p => p.trim());
+                                            if (parts.length >= 2) {
+                                                deviceData.networkInterfaces.push({
+                                                    interfaceName: parts[0] || 'Interface',
+                                                    ipAddress: parts[1]
+                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                                
+                                // Parse monitors
                                 if (row['Monitors']) {
                                     const monitorPairs = String(row['Monitors']).split(';').map(pair => pair.trim());
                                     monitorPairs.forEach(pair => {
@@ -2459,6 +2387,20 @@
                                             deviceData.monitors.push({
                                                 model: parts[0],
                                                 serial: parts[1]
+                                            });
+                                        }
+                                    });
+                                }
+                                
+                                // Parse software licenses
+                                if (row['Software Licenses'] || row['SoftwareLicenses']) {
+                                    const softwarePairs = String(row['Software Licenses'] || row['SoftwareLicenses'] || '').split(';').map(pair => pair.trim());
+                                    softwarePairs.forEach(pair => {
+                                        const parts = pair.split(':').map(p => p.trim());
+                                        if (parts.length >= 2) {
+                                            deviceData.softwareLicenses.push({
+                                                name: parts[0],
+                                                licenseKey: parts[1]
                                             });
                                         }
                                     });
@@ -3104,7 +3046,7 @@
         }
 
         // ============================================
-        // EXCEL IMPORT/EXPORT EVENT HANDLERS - UPDATED
+        // EXCEL IMPORT/EXPORT EVENT HANDLERS - SINGLE SHEET
         // ============================================
         exportBtn.addEventListener('click', function() {
             if (!inventoryData || inventoryData.length === 0) {
@@ -3112,8 +3054,8 @@
                 return;
             }
             
-            exportToExcelGroupedByDepartment(inventoryData, 'All_Devices');
-            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel grouped by department`);
+            exportToExcel(inventoryData, 'All_Devices');
+            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel in single sheet`);
         });
 
         exportAllBtn.addEventListener('click', function() {
@@ -3122,8 +3064,8 @@
                 return;
             }
             
-            exportToExcelGroupedByDepartment(inventoryData, 'All_Devices');
-            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel grouped by department`);
+            exportToExcel(inventoryData, 'All_Devices');
+            addLogEntry('Excel Export', `Exported all devices (${inventoryData.length} records) to Excel in single sheet`);
         });
 
         exportActiveBtn.addEventListener('click', function() {
@@ -3924,7 +3866,7 @@
         }
 
         // ============================================
-        // DEVICE DETAILS (FULL SCREEN) - REMOVED DEVICE TYPE
+        // DEVICE DETAILS (FULL SCREEN)
         // ============================================
         async function showDeviceDetails(deviceId) {
             const device = inventoryData.find(d => d.id === deviceId);
@@ -5014,12 +4956,12 @@
             console.log("🎨 Theme: WTC Teal Theme (Both Sites)");
             console.log("🌐 Timezone: Sri Lanka Time (Local Browser Time)");
             console.log("🔗 Firebase Project: inventory-3650f");
-            console.log("📊 Excel Support: Import/Export with SheetJS - Department Grouping Enabled");
+            console.log("📊 Excel Support: Import/Export with SheetJS - Single Sheet Only");
             console.log("⚡ Features: Multi-site, Excel Import/Export, Switch Site");
             console.log("📝 Activity Logs: Site-specific logging enabled");
             console.log("⌨️ Enter Key Navigation: Enabled for forms");
             console.log("🔍 Search: Searches all device serials, monitor serials, and license keys");
-            console.log("ℹ️ Device Type Selection: REMOVED - System now supports only PCs");
+            console.log("📄 Excel Format: All data in single sheet named 'Devices'");
             
             const currentTime = getSriLankaTime();
             console.log("🕒 Current Sri Lanka Time:", formatSriLankaTimestamp(currentTime));
