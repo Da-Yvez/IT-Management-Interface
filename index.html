@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,13 +15,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- LOGIN PAGE -->
     <div class="login-container" id="loginPage">
         <div class="login-animation"></div>
         <div class="login-animation"></div>
         <div class="login-animation"></div>
-        
+
         <div class="login-box">
             <h2><i class="fas fa-laptop-house"></i> IT Management Interface</h2>
             <p>Enter your credentials to access the system</p>
@@ -46,19 +48,19 @@
         <div class="site-selection-container">
             <h2><i class="fas fa-building"></i> Select Your Site</h2>
             <p>Choose which site you want to manage</p>
-            
+
             <div class="site-cards-container">
                 <div class="site-card" id="wtcCard">
                     <i class="fas fa-building"></i>
                     <h3>WTC</h3>
                 </div>
-                
+
                 <div class="site-card" id="hlsCard">
                     <i class="fas fa-city"></i>
                     <h3>HLS</h3>
                 </div>
             </div>
-            
+
             <button class="back-to-login-btn" id="backToLoginBtn">
                 <i class="fas fa-arrow-left"></i> Back to Login
             </button>
@@ -82,33 +84,42 @@
 
         <div class="container">
             <!-- SIDEBAR MENU -->
-            <div class="sidebar">
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </div>
                 <ul class="sidebar-menu">
                     <li class="active" data-section="inventory">
-                        <i class="fas fa-laptop"></i> Device Inventory
+                        <i class="fas fa-laptop"></i> <span>Device Inventory</span>
                     </li>
                     <li data-section="addDevice">
-                        <i class="fas fa-plus-circle"></i> Add New Device
+                        <i class="fas fa-plus-circle"></i> <span>Add New Device</span>
                     </li>
                     <li data-section="reportFailure">
-                        <i class="fas fa-exclamation-triangle"></i> Report Failure
+                        <i class="fas fa-exclamation-triangle"></i> <span>Report Failure</span>
                     </li>
                     <li data-section="failedDevices">
-                        <i class="fas fa-tools"></i> Failed Devices
+                        <i class="fas fa-tools"></i> <span>Failed Devices</span>
                     </li>
                     <li data-section="replaceDevice">
-                        <i class="fas fa-exchange-alt"></i> Replace Device
+                        <i class="fas fa-exchange-alt"></i> <span>Replace Device</span>
                     </li>
                     <li data-section="excelImport">
-                        <i class="fas fa-file-excel"></i> Excel Import/Export
+                        <i class="fas fa-file-excel"></i> <span>Excel Import/Export</span>
                     </li>
                     <li data-section="logs">
-                        <i class="fas fa-history"></i> Activity Logs
+                        <i class="fas fa-history"></i> <span>Activity Logs</span>
                     </li>
                     <li data-section="networkDiagram">
-                        <i class="fas fa-project-diagram"></i> Network Diagram
+                        <i class="fas fa-project-diagram"></i> <span>Network Diagram</span>
                     </li>
                 </ul>
+
+                <!-- FIREBASE STATUS INDICATOR (Moved here) -->
+                <div id="firebaseStatus" class="firebase-status status-disconnected">
+                    <i class="fas fa-plug"></i>
+                    <span>Firebase: Disconnected</span>
+                </div>
             </div>
 
             <!-- MAIN CONTENT -->
@@ -116,7 +127,7 @@
                 <!-- INVENTORY SECTION -->
                 <div class="section active" id="inventory">
                     <h2><i class="fas fa-laptop"></i> Device Inventory Dashboard</h2>
-                    
+
                     <!-- STATISTICS -->
                     <div class="stats-container">
                         <div class="stat-card" id="totalDevicesCard">
@@ -140,8 +151,8 @@
                     <!-- ACTION BAR -->
                     <div class="actions-bar">
                         <div class="search-filter">
-                            <input type="text" class="search-box" id="searchBox" 
-                                   placeholder="Search PC Number, Serial, User, or Monitor Serial...">
+                            <input type="text" class="search-box" id="searchBox"
+                                placeholder="Search PC Number, Serial, User, or Monitor Serial...">
                             <select class="filter-select" id="departmentFilter">
                                 <option value="">All Departments</option>
                                 <!-- Departments will be populated based on site -->
@@ -170,6 +181,7 @@
                                     <th>IP Address</th>
                                     <th>Department</th>
                                     <th>User</th>
+                                    <th>Added By</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -179,9 +191,10 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div class="no-data" id="noDataMessage" style="display: none;">
-                        <i class="fas fa-laptop" style="font-size: 60px; color: var(--border-color); margin-bottom: 20px;"></i>
+                        <i class="fas fa-laptop"
+                            style="font-size: 60px; color: var(--border-color); margin-bottom: 20px;"></i>
                         <h3 style="color: var(--text-gray); margin-bottom: 10px;">No Devices Found</h3>
                         <p style="color: var(--text-gray);">Click "Add Device" to add your first inventory item</p>
                     </div>
@@ -195,11 +208,13 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="pcNumber"><i class="fas fa-hashtag"></i> Device Number *</label>
-                                    <input type="text" id="pcNumber" placeholder="PC-001" required class="form-field" tabindex="1">
+                                    <input type="text" id="pcNumber" placeholder="PC-001" required class="form-field"
+                                        tabindex="1">
                                 </div>
                                 <div class="form-group">
                                     <label for="pcModel"><i class="fas fa-laptop"></i> PC Model *</label>
-                                    <input type="text" id="pcModel" placeholder="Dell OptiPlex 7080" required class="form-field" tabindex="2">
+                                    <input type="text" id="pcModel" placeholder="Dell OptiPlex 7080" required
+                                        class="form-field" tabindex="2">
                                 </div>
                             </div>
 
@@ -207,13 +222,15 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="pcSerial"><i class="fas fa-barcode"></i> PC Serial Number *</label>
-                                    <input type="text" id="pcSerial" placeholder="Serial number" required class="form-field" tabindex="3">
+                                    <input type="text" id="pcSerial" placeholder="Serial number" required
+                                        class="form-field" tabindex="3">
                                 </div>
                             </div>
 
                             <!-- NETWORK INTERFACES SECTION -->
                             <div class="network-interfaces-container" id="networkInterfacesContainer">
-                                <h3 style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                                <h3
+                                    style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fas fa-network-wired"></i> Network Interfaces
                                 </h3>
                                 <div id="networkInterfacesList">
@@ -226,7 +243,8 @@
 
                             <!-- MONITORS SECTION -->
                             <div class="monitors-container" id="monitorsContainer">
-                                <h3 style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                                <h3
+                                    style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fas fa-tv"></i> Monitors
                                 </h3>
                                 <div id="monitorsList">
@@ -239,7 +257,8 @@
 
                             <!-- SOFTWARE LICENSES SECTION -->
                             <div class="software-licenses-container" id="softwareLicensesContainer">
-                                <h3 style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                                <h3
+                                    style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fas fa-copyright"></i> Licensed Software
                                 </h3>
                                 <div id="softwareLicensesList">
@@ -260,7 +279,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="userName"><i class="fas fa-user"></i> User Name</label>
-                                    <input type="text" id="userName" placeholder="User's name" class="form-field" tabindex="5">
+                                    <input type="text" id="userName" placeholder="User's name" class="form-field"
+                                        tabindex="5">
                                 </div>
                             </div>
 
@@ -268,19 +288,23 @@
                             <div class="specs-grid" id="specsGrid">
                                 <div class="spec-card">
                                     <label><i class="fas fa-microchip"></i> CPU</label>
-                                    <input type="text" id="cpu" placeholder="e.g., Intel i7-10700" class="form-field" tabindex="6">
+                                    <input type="text" id="cpu" placeholder="e.g., Intel i7-10700" class="form-field"
+                                        tabindex="6">
                                 </div>
                                 <div class="spec-card">
                                     <label><i class="fas fa-gamepad"></i> GPU</label>
-                                    <input type="text" id="gpu" placeholder="e.g., NVIDIA GTX 1660" class="form-field" tabindex="7">
+                                    <input type="text" id="gpu" placeholder="e.g., NVIDIA GTX 1660" class="form-field"
+                                        tabindex="7">
                                 </div>
                                 <div class="spec-card">
                                     <label><i class="fas fa-memory"></i> RAM</label>
-                                    <input type="text" id="ram" placeholder="e.g., 16GB DDR4" class="form-field" tabindex="8">
+                                    <input type="text" id="ram" placeholder="e.g., 16GB DDR4" class="form-field"
+                                        tabindex="8">
                                 </div>
                                 <div class="spec-card">
                                     <label><i class="fas fa-hdd"></i> Storage</label>
-                                    <input type="text" id="storage" placeholder="e.g., 512GB SSD" class="form-field" tabindex="9">
+                                    <input type="text" id="storage" placeholder="e.g., 512GB SSD" class="form-field"
+                                        tabindex="9">
                                 </div>
                             </div>
 
@@ -318,8 +342,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="failureReason"><i class="fas fa-comment-medical"></i> Failure Reason *</label>
-                                <textarea id="failureReason" rows="4" placeholder="Describe the issue in detail..." required class="form-field" tabindex="2"></textarea>
+                                <label for="failureReason"><i class="fas fa-comment-medical"></i> Failure Reason
+                                    *</label>
+                                <textarea id="failureReason" rows="4" placeholder="Describe the issue in detail..."
+                                    required class="form-field" tabindex="2"></textarea>
                             </div>
 
                             <div class="form-row">
@@ -361,11 +387,11 @@
                 <!-- FAILED DEVICES SECTION -->
                 <div class="section" id="failedDevices">
                     <h2><i class="fas fa-tools"></i> Failed Devices Management</h2>
-                    
+
                     <div class="actions-bar">
                         <div class="search-filter">
-                            <input type="text" class="search-box" id="failedSearchBox" 
-                                   placeholder="Search failed devices...">
+                            <input type="text" class="search-box" id="failedSearchBox"
+                                placeholder="Search failed devices...">
                             <select class="filter-select" id="failedPriorityFilter">
                                 <option value="">All Priorities</option>
                                 <option value="low">Low</option>
@@ -400,9 +426,10 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div class="no-data" id="noFailedDataMessage" style="display: none;">
-                        <i class="fas fa-check-circle" style="font-size: 60px; color: var(--border-color); margin-bottom: 20px;"></i>
+                        <i class="fas fa-check-circle"
+                            style="font-size: 60px; color: var(--border-color); margin-bottom: 20px;"></i>
                         <h3 style="color: var(--text-gray); margin-bottom: 10px;">No Failed Devices Found</h3>
                         <p style="color: var(--text-gray);">All devices are currently operational</p>
                     </div>
@@ -414,7 +441,8 @@
                     <div class="form-container">
                         <form id="replaceDeviceForm">
                             <div class="form-group">
-                                <label for="replaceDeviceSelect"><i class="fas fa-laptop"></i> Select Device to Replace *</label>
+                                <label for="replaceDeviceSelect"><i class="fas fa-laptop"></i> Select Device to Replace
+                                    *</label>
                                 <select id="replaceDeviceSelect" required class="form-field" tabindex="1">
                                     <option value="">Select a device to replace</option>
                                 </select>
@@ -422,8 +450,10 @@
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="replacementPcNumber"><i class="fas fa-desktop"></i> New Device Number *</label>
-                                    <input type="text" id="replacementPcNumber" required class="form-field" tabindex="2">
+                                    <label for="replacementPcNumber"><i class="fas fa-desktop"></i> New Device Number
+                                        *</label>
+                                    <input type="text" id="replacementPcNumber" required class="form-field"
+                                        tabindex="2">
                                 </div>
                                 <div class="form-group">
                                     <label for="replacementPcModel"><i class="fas fa-microchip"></i> New Model *</label>
@@ -433,18 +463,23 @@
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="replacementSerial"><i class="fas fa-barcode"></i> New Serial Number *</label>
+                                    <label for="replacementSerial"><i class="fas fa-barcode"></i> New Serial Number
+                                        *</label>
                                     <input type="text" id="replacementSerial" required class="form-field" tabindex="4">
                                 </div>
                                 <div class="form-group">
-                                    <label for="replacementDate"><i class="fas fa-calendar-alt"></i> Replacement Date *</label>
+                                    <label for="replacementDate"><i class="fas fa-calendar-alt"></i> Replacement Date
+                                        *</label>
                                     <input type="date" id="replacementDate" required class="form-field" tabindex="5">
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="replacementReason"><i class="fas fa-comment-medical"></i> Replacement Reason</label>
-                                <textarea id="replacementReason" rows="3" placeholder="Why is this device being replaced?" class="form-field" tabindex="6"></textarea>
+                                <label for="replacementReason"><i class="fas fa-comment-medical"></i> Replacement
+                                    Reason</label>
+                                <textarea id="replacementReason" rows="3"
+                                    placeholder="Why is this device being replaced?" class="form-field"
+                                    tabindex="6"></textarea>
                             </div>
 
                             <div class="form-group">
@@ -470,11 +505,11 @@
                 <!-- EXCEL IMPORT/EXPORT SECTION -->
                 <div class="section" id="excelImport">
                     <h2><i class="fas fa-file-excel"></i> Excel Import/Export</h2>
-                    
+
                     <div class="excel-import-container">
                         <h3><i class="fas fa-file-export"></i> Export Data to Excel</h3>
                         <p>Export all devices data to an Excel file for backup or reporting purposes.</p>
-                        
+
                         <div class="excel-actions">
                             <button class="btn btn-excel" id="exportAllBtn">
                                 <i class="fas fa-file-export"></i> Export All Devices
@@ -486,7 +521,7 @@
                                 <i class="fas fa-file-export"></i> Export Failed Devices
                             </button>
                         </div>
-                        
+
                         <div class="template-download">
                             <h4><i class="fas fa-download"></i> Download Template</h4>
                             <p>Download an Excel template with the correct format for importing devices.</p>
@@ -495,11 +530,11 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="excel-import-container">
                         <h3><i class="fas fa-file-import"></i> Import Data from Excel</h3>
                         <p>Import devices from an Excel file. Make sure the file follows the template format.</p>
-                        
+
                         <div class="excel-actions">
                             <div class="file-input-container">
                                 <input type="file" id="excelFileInput" accept=".xlsx, .xls">
@@ -511,24 +546,29 @@
                                 <i class="fas fa-upload"></i> Import Devices
                             </button>
                         </div>
-                        
+
                         <div id="importProgress" style="display: none; margin-top: 20px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span id="importProgressText">Processing...</span>
                             </div>
-                            <div style="margin-top: 10px; width: 100%; background: var(--secondary-light); border-radius: 4px; overflow: hidden;">
-                                <div id="importProgressBar" style="height: 10px; background: var(--primary-color); width: 0%; transition: width 0.3s;"></div>
+                            <div
+                                style="margin-top: 10px; width: 100%; background: var(--secondary-light); border-radius: 4px; overflow: hidden;">
+                                <div id="importProgressBar"
+                                    style="height: 10px; background: var(--primary-color); width: 0%; transition: width 0.3s;">
+                                </div>
                             </div>
                             <div id="importResults" style="margin-top: 15px;"></div>
                         </div>
-                        
-                        <div style="margin-top: 25px; padding: 20px; background: var(--secondary-light); border-radius: 8px; border: 1px solid var(--border-color);">
+
+                        <div
+                            style="margin-top: 25px; padding: 20px; background: var(--secondary-light); border-radius: 8px; border: 1px solid var(--border-color);">
                             <h4><i class="fas fa-info-circle"></i> Import Instructions</h4>
                             <ol style="margin-left: 20px; margin-top: 10px; color: var(--text-gray);">
                                 <li>Download the template above to see the required format</li>
                                 <li>Required columns: Device Number, PC Model, PC Serial, Department</li>
-                                <li>Optional columns: User Name, CPU, GPU, RAM, Storage, Monitor Model, Monitor Serial, Status</li>
+                                <li>Optional columns: User Name, CPU, GPU, RAM, Storage, Monitor Model, Monitor Serial,
+                                    Status</li>
                                 <li>Status can be: active, failed, or replaced</li>
                                 <li>Maximum 100 devices per import</li>
                                 <li>All data should be in a single sheet named "Devices"</li>
@@ -579,9 +619,10 @@
                         <button class="diagram-btn" id="viewDiagramBtn">
                             <i class="fas fa-external-link-alt"></i> Open Network Diagram
                         </button>
-                        <div style="margin-top: 30px; padding: 20px; background: var(--secondary-light); border-radius: 8px;">
+                        <div
+                            style="margin-top: 30px; padding: 20px; background: var(--secondary-light); border-radius: 8px;">
                             <p style="color: var(--text-gray);">
-                                <i class="fas fa-link"></i> URL: 
+                                <i class="fas fa-link"></i> URL:
                                 <code style="color: var(--primary-color);" id="networkDiagramUrl">Loading...</code>
                             </p>
                         </div>
@@ -643,13 +684,44 @@
         </div>
     </div>
 
-    <!-- FIREBASE STATUS INDICATOR -->
-    <div id="firebaseStatus" class="firebase-status status-disconnected">
-        <i class="fas fa-plug"></i>
-        <span>Firebase: Disconnected</span>
+    <!-- PASSWORD CHANGE MODAL -->
+    <div class="modal" id="passwordChangeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> First Login: Change Password</h3>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: var(--text-gray);">For security reasons, you must change your
+                    temporary password before accessing the system.</p>
+                <form id="passwordChangeForm">
+                    <div class="form-group">
+                        <label for="newPassword"><i class="fas fa-lock"></i> New Password *</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password" required
+                            class="form-field">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm New Password *</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password" required
+                            class="form-field">
+                    </div>
+                    <div class="error-message" id="passwordChangeError" style="margin-bottom: 20px;">
+                        <i class="fas fa-exclamation-circle"></i> Passwords do not match
+                    </div>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; justify-content: center; margin-bottom: 10px;">
+                        <i class="fas fa-save"></i> Update Password & Continue
+                    </button>
+                    <button type="button" class="btn btn-warning" id="logoutFromPasswordChangeBtn"
+                        style="width: 100%; justify-content: center;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- JAVASCRIPT -->
     <script src="js/app.js"></script>
 </body>
+
 </html>

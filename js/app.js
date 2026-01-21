@@ -944,6 +944,14 @@ const switchSiteBtn = document.getElementById('switchSiteBtn');
 const loginError = document.getElementById('loginError');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
+const passwordChangeModal = document.getElementById('passwordChangeModal');
+const passwordChangeForm = document.getElementById('passwordChangeForm');
+const passwordChangeError = document.getElementById('passwordChangeError');
+const newPasswordInput = document.getElementById('newPassword');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const logoutFromPasswordChangeBtn = document.getElementById('logoutFromPasswordChangeBtn');
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
 const wtcCard = document.getElementById('wtcCard');
 const hlsCard = document.getElementById('hlsCard');
 const backToLoginBtn = document.getElementById('backToLoginBtn');
@@ -1042,9 +1050,6 @@ const failedDevicesElement = document.getElementById('failedDevices');
 const replacedDevicesElement = document.getElementById('replacedDevices');
 
 // ============================================
-// LOGIN FUNCTIONALITY - FIXED
-// ============================================
-// ============================================
 // LOGIN FUNCTIONALITY
 // ============================================
 const AUTH_DOMAIN_SUFFIX = "@inventory.system";
@@ -1058,7 +1063,8 @@ loginBtn.addEventListener('click', async function () {
         return;
     }
 
-    const email = username + AUTH_DOMAIN_SUFFIX;
+    // Map username to a virtual email for Firebase Auth
+    const email = username.includes('@') ? username : username + AUTH_DOMAIN_SUFFIX;
 
     const originalButtonText = loginBtn.innerHTML;
     const originalButtonState = loginBtn.disabled;
@@ -1068,14 +1074,19 @@ loginBtn.addEventListener('click', async function () {
     loginError.style.display = 'none';
 
     try {
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
+        console.log("✅ Login successful:", user.uid);
 
-        // Success - UI transition handled by onAuthStateChanged or here
-        console.log("Login successful:", user.uid);
+        // Add a log entry for login
+        await addLogToFirebase({
+            action: 'Login',
+            details: `${username} logged into the system`,
+            user: username
+        });
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.error("❌ Login error:", error);
 
         let errorMessage = "Invalid username or password";
         if (error.code === 'auth/user-not-found') {
@@ -1084,6 +1095,8 @@ loginBtn.addEventListener('click', async function () {
             errorMessage = "Incorrect password";
         } else if (error.code === 'auth/too-many-requests') {
             errorMessage = "Too many failed attempts. Try again later.";
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = "Network error. Please check your connection.";
         }
 
         showLoginError(errorMessage);
@@ -1094,11 +1107,12 @@ loginBtn.addEventListener('click', async function () {
 });
 
 function showLoginError(message) {
-    loginError.textContent = message;
+    loginError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
     loginError.style.display = 'block';
-    usernameInput.style.borderColor = "#DC3545";
-    passwordInput.style.borderColor = "#DC3545";
+    usernameInput.style.borderColor = "var(--danger-color)";
+    passwordInput.style.borderColor = "var(--danger-color)";
 
+    const loginBox = document.querySelector('.login-box');
     loginBox.style.animation = 'none';
     setTimeout(() => {
         loginBox.style.animation = 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both';
@@ -1106,16 +1120,44 @@ function showLoginError(message) {
 }
 
 // Auth State Listener
-firebase.auth().onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
     if (user) {
-        // Determine username from email (remove suffix)
+        // Determine username from email (remove suffix if present)
         const email = user.email || "";
-        const displayUsername = email.replace(AUTH_DOMAIN_SUFFIX, "");
+        const displayUsername = email.includes(AUTH_DOMAIN_SUFFIX)
+            ? email.replace(AUTH_DOMAIN_SUFFIX, "")
+            : email.split('@')[0];
 
         currentUser = displayUsername;
-        document.getElementById('currentUserName').textContent = displayUsername.charAt(0).toUpperCase() + displayUsername.slice(1);
+        const userNameElement = document.getElementById('currentUserName');
+        if (userNameElement) {
+            userNameElement.textContent = displayUsername.charAt(0).toUpperCase() + displayUsername.slice(1);
+        }
 
-        if (loginPage.style.display !== 'none') {
+        // Check for first-time login / password change requirement
+        try {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userData = userDoc.data();
+
+            if (!userDoc.exists || (userData && userData.needsPasswordChange !== false)) {
+                console.log("🔄 First-time login detected. Prompting for password change.");
+                passwordChangeModal.style.display = 'flex';
+                loginPage.style.display = 'none'; // Hide login if we're here
+                return;
+            }
+        } catch (error) {
+            console.error("Error checking user status:", error);
+        }
+
+        // Session Persistence: Check if a site was previously selected
+        const savedSite = localStorage.getItem('selectedSite');
+
+        if (savedSite && siteConfig[savedSite]) {
+            console.log(`🏠 Restoring session for site: ${savedSite}`);
+            selectSite(savedSite, true); // true means skip animation
+        } else if (loginPage.style.display !== 'none' || passwordChangeModal.style.display !== 'none') {
+            // Transition to site selection if we're on login/password change
+            passwordChangeModal.style.display = 'none';
             loginPage.style.animation = 'slideOut 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
             setTimeout(() => {
                 loginPage.style.display = 'none';
@@ -1124,15 +1166,35 @@ firebase.auth().onAuthStateChanged((user) => {
             }, 800);
         }
     } else {
-        // User is signed out
-        if (appContainer.style.display !== 'none' || siteSelectionPage.style.display !== 'none') {
-            // Force navigation back to login if logged out (and not already there)
-            appContainer.style.display = 'none';
-            siteSelectionPage.style.display = 'none';
-            loginPage.style.display = 'flex';
-        }
+        // User is signed out - ensure they are on the login page
+        handleLogoutUI();
     }
 });
+
+async function handleLogout() {
+    try {
+        await auth.signOut();
+        localStorage.removeItem('selectedSite');
+        console.log("👋 Logged out successfully");
+    } catch (error) {
+        console.error("Error logging out:", error);
+    }
+}
+
+function handleLogoutUI() {
+    appContainer.style.display = 'none';
+    siteSelectionPage.style.display = 'none';
+    passwordChangeModal.style.display = 'none';
+    loginPage.style.display = 'flex';
+    loginPage.style.animation = 'fadeIn 0.8s ease-out';
+
+    // Clear sensitive data
+    currentSite = null;
+    inventoryData = [];
+    activityLogs = [];
+    if (realTimeUnsubscribe) realTimeUnsubscribe();
+    if (logsUnsubscribe) logsUnsubscribe();
+}
 
 const style = document.createElement('style');
 style.textContent = `
@@ -1156,21 +1218,16 @@ hlsCard.addEventListener('click', function () {
     selectSite('hls');
 });
 
-backToLoginBtn.addEventListener('click', function () {
-    siteSelectionPage.style.animation = 'slideOut 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+backToLoginBtn.addEventListener('click', handleLogout);
 
-    setTimeout(() => {
-        siteSelectionPage.style.display = 'none';
-        loginPage.style.display = 'flex';
-        loginPage.style.animation = 'slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+logoutBtn.addEventListener('click', handleLogout);
 
-        usernameInput.value = '';
-        passwordInput.value = '';
-        usernameInput.focus();
-    }, 800);
-});
+if (logoutFromPasswordChangeBtn) {
+    logoutFromPasswordChangeBtn.addEventListener('click', handleLogout);
+}
 
 switchSiteBtn.addEventListener('click', function () {
+    localStorage.removeItem('selectedSite');
     appContainer.style.animation = 'slideOut 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
 
     setTimeout(() => {
@@ -1192,14 +1249,37 @@ switchSiteBtn.addEventListener('click', function () {
     }, 800);
 });
 
-function selectSite(siteName) {
+function selectSite(siteName, skipAnimation = false) {
     currentSite = siteConfig[siteName];
+    localStorage.setItem('selectedSite', siteName);
 
     siteTitle.textContent = `${currentSite.name} - IT Management Interface`;
     networkDiagramUrl.textContent = currentSite.networkDiagram;
 
     updateDepartmentDropdowns();
     updateTechnicianDropdowns();
+
+    if (skipAnimation) {
+        loginPage.style.display = 'none';
+        siteSelectionPage.style.display = 'none';
+        passwordChangeModal.style.display = 'none';
+        appContainer.style.display = 'block';
+
+        loadInventoryFromFirebase();
+        loadLogsFromFirebase();
+        startRealTimeUpdates();
+        startRealTimeLogs();
+
+        updateFailureDeviceDropdown();
+        updateReplaceDeviceDropdown();
+
+        addDefaultNetworkInterface();
+        addDefaultMonitor();
+        addDefaultSoftwareLicense();
+
+        setupEnterKeyNavigation();
+        return;
+    }
 
     siteSelectionPage.style.animation = 'slideOut 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
 
@@ -1701,6 +1781,7 @@ function loadFilteredTable(filteredData, title) {
                     <td>${ipInfo}</td>
                     <td><span class="status-badge" style="background: rgba(0, 49, 53, 0.1); color: var(--primary-color);">${device.department || 'N/A'}</span></td>
                     <td>${device.userName || 'N/A'}</td>
+                    <td>${device.createdBy || (currentSite && currentSite.name === 'WTC' ? 'Adithya' : 'N/A')}</td>
                     <td>${statusBadge}</td>
                     <td>
                         <button class="btn btn-primary btn-sm view-btn" data-id="${device.id}" title="View Details">
@@ -1898,6 +1979,7 @@ function loadInventoryTable() {
                     <td>${ipInfo}</td>
                     <td><span class="status-badge" style="background: rgba(0, 49, 53, 0.1); color: var(--primary-color);">${device.department || 'N/A'}</span></td>
                     <td>${device.userName || 'N/A'}</td>
+                    <td>${device.createdBy || (currentSite && currentSite.name === 'WTC' ? 'Adithya' : 'N/A')}</td>
                     <td>${statusBadge}</td>
                     <td>
                         <button class="btn btn-primary btn-sm view-btn" data-id="${device.id}" title="View Details">
@@ -2120,6 +2202,10 @@ async function showDeviceDetails(deviceId) {
                         <div class="device-item">
                             <div class="device-label"><i class="fas fa-user"></i> User Name:</div>
                             <div class="device-value">${device.userName || 'N/A'}</div>
+                        </div>
+                        <div class="device-item">
+                            <div class="device-label"><i class="fas fa-user-edit"></i> Added By:</div>
+                            <div class="device-value">${device.createdBy || (currentSite && currentSite.name === 'WTC' ? 'Adithya' : 'N/A')}</div>
                         </div>
                         <div class="device-item">
                             <div class="device-label"><i class="fas fa-info-circle"></i> Status:</div>
@@ -3154,12 +3240,114 @@ addSoftwareLicenseBtn.addEventListener('click', function () {
 });
 
 // ============================================
+// PASSWORD CHANGE FUNCTIONALITY
+// ============================================
+if (passwordChangeForm) {
+    passwordChangeForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        const user = auth.currentUser;
+
+        if (!newPassword || !confirmPassword) {
+            showPasswordError('Please fill in all fields');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showPasswordError('Passwords do not match');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showPasswordError('Password must be at least 6 characters');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        submitBtn.disabled = true;
+        passwordChangeError.style.display = 'none';
+
+        try {
+            // 1. Update password in Firebase Auth
+            await user.updatePassword(newPassword);
+            console.log("✅ Password updated in Auth");
+
+            // 2. Update flag in Firestore
+            await db.collection('users').doc(user.uid).set({
+                username: currentUser,
+                needsPasswordChange: false,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            console.log("✅ User record updated in Firestore");
+
+            // 3. Close modal and transition to site selection
+            passwordChangeModal.style.display = 'none';
+
+            if (loginPage.style.display !== 'none') {
+                loginPage.style.animation = 'slideOut 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+                setTimeout(() => {
+                    loginPage.style.display = 'none';
+                    siteSelectionPage.style.display = 'flex';
+                    siteSelectionPage.style.animation = 'slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                }, 800);
+            }
+
+        } catch (error) {
+            console.error("❌ Password change error:", error);
+            let message = "Error updating password. Please try again.";
+            if (error.code === 'auth/requires-recent-login') {
+                message = "Session expired. Please log in again.";
+                setTimeout(() => auth.signOut(), 2000);
+            }
+            showPasswordError(message);
+        } finally {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+function showPasswordError(message) {
+    passwordChangeError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    passwordChangeError.style.display = 'block';
+}
+
+// ============================================
+// SIDEBAR FUNCTIONALITY
+// ============================================
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function () {
+        sidebar.classList.toggle('minimized');
+        const isMinimized = sidebar.classList.contains('minimized');
+        localStorage.setItem('sidebarMinimized', isMinimized);
+
+        // Update toggle icon
+        const icon = sidebarToggle.querySelector('i');
+        if (isMinimized) {
+            icon.className = 'fas fa-chevron-right';
+        } else {
+            icon.className = 'fas fa-bars';
+        }
+    });
+}
+
+// Restore sidebar state
+function restoreSidebarState() {
+    const isMinimized = localStorage.getItem('sidebarMinimized') === 'true';
+    if (isMinimized && sidebar) {
+        sidebar.classList.add('minimized');
+        const icon = sidebarToggle.querySelector('i');
+        if (icon) icon.className = 'fas fa-chevron-right';
+    }
+}
+
+// ============================================
 // INITIALIZATION
 // ============================================
-const today = new Date();
-document.getElementById('failureDate').valueAsDate = today;
-document.getElementById('replacementDate').valueAsDate = today;
-
 passwordInput.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') loginBtn.click();
 });
@@ -3174,7 +3362,13 @@ passwordInput.addEventListener('input', function () {
     loginError.style.display = 'none';
 });
 
-window.addEventListener('DOMContentLoaded', async function () {
+// Run initialization
+document.addEventListener('DOMContentLoaded', async function () {
+    restoreSidebarState();
+    const today = new Date();
+    document.getElementById('failureDate').valueAsDate = today;
+    document.getElementById('replacementDate').valueAsDate = today;
+
     console.log("🚀 IT Management Interface Initialized");
     console.log("🎨 Theme: WTC Teal Theme (Both Sites)");
     console.log("🌐 Timezone: Sri Lanka Time (Local Browser Time)");
